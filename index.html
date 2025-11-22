@@ -386,8 +386,10 @@
         const BAZA_PYTAN = {
             "Jedzenie i picie": ["Pizza", "Bimber", "Sushi", "Hamburger", "Spaghetti", "Lody", "Pierogi", "Kebab", "Arbuz", "Truskawka", "Brokuł", "Donut z cukrem", "Makaron", "Grochówka", "Pomidorowa", "Coca-cola", "Ser", "Herbata", "Kawa", "Matcha", "Kakao", "Kompot", "Masło", "Miód", "Cynamon", "Szarlotka", "Sernik", "Nachosy", "Popcorn", "Szpinak", "Rodzynki", "Orzechy laskowe", "Ogórkowa", "Rosół", "Whiskey", "Wódka", "Piwo", "Piwo zero", "Woda", "Cebularz"],
             "Filmy": ["Titanic", "Avatar", "Gladiator", "Matrix", "Shrek", "Joker", "Interstellar", "Furioza", "Pulp Fiction", "Ojciec chrzestny"],
-            "Przedmioty": ["Telefon", "Laptop", "Zegarek", "Gitara", "Rower", "Aparat", "Mikrofon", "Książka", "Tłok"],
-            "Zwierzęta": ["Kot", "Pies", "Słoń", "Delfin", "Orzeł", "Lew", "Pingwin", "Koala", "Ślimak"],
+            "Przedmioty": ["Tłok", "Krzesło", "Stół", "Lampa", "Telefon", "Komputer", "Klawiatura", "Myszka", "Monitor", "Zeszyt", "Długopis",
+"Poduszka", "Koc", "Łóżko", "Szafa", "Lustro", "Zegar", "Dywan", "Zasłona", "Doniczka", "Kwiat", "Pilot", "Telewizor",
+"Słuchawki", "Głośnik", "Mikrofon", "Ładowarka", "Kabel", "Pendrive", "Powerbank", "Klucze", "Portfel", "Dokumenty", "Karta", "Okulary", "Etui", "Parasol", "Torba", "Walizka", "Czapka", "Kurtka", "Rękawiczki", "Skarpety", "Buty", "Pasek", "Szalik"],
+            "Zwierzęta": ["Papuga", "Jednorożec","Kot", "Pies", "Słoń", "Delfin", "Orzeł", "Lew", "Pingwin", "Koala", "Ślimak"],
             "Zawody": ["Lekarz", "Nauczyciel", "Strażak", "Pilot", "Kucharz", "Prawnik", "Programista", "Aktor"]
         };
 
@@ -437,7 +439,7 @@
         // Aktualizuj opcje oszustów
         function updateOszustyOptions() {
             const select = document.getElementById('oszustySelect');
-            const maxOszustow = Math.max(1, gracze.length / 2);
+            const maxOszustow = Math.max(1, 3);
             
             select.innerHTML = '';
             for (let i = 1; i <= maxOszustow; i++) {
