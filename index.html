@@ -113,9 +113,9 @@
             font-size:1.3em; font-weight:bold; box-shadow:0 4px 15px rgba(245,87,108,0.4);
         }
         .gracz-badge {
-            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            background:linear-gradient(135deg,#4caf50 0%,#2e7d32 100%);
             padding:8px 20px; border-radius:25px; display:inline-block; margin:10px 0;
-            font-size:1.3em; font-weight:bold; box-shadow:0 4px 15px rgba(102,126,234,.4);
+            font-size:1.3em; font-weight:bold; box-shadow:0 4px 15px rgba(76,175,80,0.4);
         }
         .category-tag {
             background:rgba(255,255,255,0.15); padding:6px 15px; border-radius:20px; display:inline-block; margin:5px 0;
@@ -157,15 +157,33 @@
             opacity:0.5;
         }
         @keyframes chaosColor {
-            0% { color: #f5576c; }
-            25% { color: #f093fb; }
-            50% { color: #667eea; }
-            75% { color: #f5576c; }
-            100% { color: #f093fb; }
+            0% { color: #ff0000; }   /* czerwony */
+            16.66% { color: #ff7f00; } /* pomarańczowy */
+            33.33% { color: #ffff00; } /* żółty */
+            50% { color: #00ff00; }   /* zielony */
+            66.66% { color: #0000ff; } /* niebieski */
+            83.33% { color: #4b0082; } /* indygo */
+            100% { color: #9400d3; }  /* fioletowy */
         }
         #chaosOptionText.chaos-active {
             animation: chaosColor 2s ease-in-out infinite;
             font-weight: bold;
+        }
+        @keyframes jesterColor {
+            0% { color: #f093fb; }   /* różowy */
+            25% { color: #e91e63; }  /* różowy ciemniejszy */
+            50% { color: #9c27b0; }  /* fioletowy */
+            75% { color: #7b1fa2; }  /* fioletowy ciemniejszy */
+            100% { color: #f093fb; } /* różowy */
+        }
+        #jesterOptionText.jester-active {
+            animation: jesterColor 2s ease-in-out infinite;
+            font-weight: bold;
+        }
+        .jester-badge {
+            background:linear-gradient(135deg,#f093fb 0%,#e91e63 100%);
+            padding:8px 20px; border-radius:25px; display:inline-block; margin:10px 0;
+            font-size:1.3em; font-weight:bold; box-shadow:0 4px 15px rgba(240,147,251,0.4);
         }
     </style>
 </head>
@@ -199,6 +217,15 @@
             </label>
             <p style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:5px;font-style:italic;">
                 Jeśli włączone, jest 25% szans że wszyscy gracze będą oszustami!
+            </p>
+        </div>
+        <div class="input-group">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
+                <input type="checkbox" id="jesterCheckbox" style="width:20px;height:20px;cursor:pointer;accent-color:#f093fb;">
+                <span id="jesterOptionText">Opcja Jester</span>
+            </label>
+            <p style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:5px;font-style:italic;">
+                Jeśli włączone, maksymalnie 1 gracz otrzyma rolę Jester!
             </p>
         </div>
         <button class="btn-primary" id="startBtn" disabled>START GRY</button>
@@ -242,6 +269,15 @@
         <button class="btn-primary" id="continueBtnChaos" style="margin-bottom:10px;">KONTYNUUJ GRĘ</button>
         <button class="btn-primary" id="newGameBtnChaos">NOWA GRA</button>
     </div>
+    <!-- Ekran Zwycięstwa Jestera -->
+    <div id="jesterWinScreen" class="screen">
+        <h1 style="font-size:4em;margin:30px 0;color:#f093fb;">jester was wydymał</h1>
+        <div class="role-display" style="min-height:200px;">
+            <p style="font-size:1.5em;margin:20px 0;">Jester był w top wynikach głosowania!</p>
+        </div>
+        <button class="btn-primary" id="continueBtnJester" style="margin-bottom:10px;">KONTYNUUJ GRĘ</button>
+        <button class="btn-primary" id="newGameBtnJester">NOWA GRA</button>
+    </div>
 </div>
 
 <script>
@@ -258,6 +294,7 @@
     let gracze = [], liczbaOszustow = 1, graczeDane = {}, aktualnieWidoczny = null;
     let wybraneKategorie = new Set(Object.keys(BAZA_PYTAN));
     let wszyscyOszusciEnabled = false;
+    let jesterEnabled = false; // czy opcja Jester jest włączona
     let czyChaos = false; // czy wszyscy są oszustami (opcja chaos)
     let glosy = {}; // {gracz: [lista zagłosowanych]}
     let aktualnyGlosujacy = 0; // indeks w tablicy gracze
@@ -274,6 +311,7 @@
           totalWordsCount = $('totalWordsCount'),
           startBtn = $('startBtn'),
           allOszusciCheckbox = $('allOszusciCheckbox'),
+          jesterCheckbox = $('jesterCheckbox'),
           roleDisplay = $('roleDisplay'),
           playerButtons = $('playerButtons'),
           endGameBtn = $('endGameBtn'),
@@ -288,7 +326,9 @@
           continueBtn = $('continueBtn'),
           newGameBtn = $('newGameBtn'),
           continueBtnChaos = $('continueBtnChaos'),
-          newGameBtnChaos = $('newGameBtnChaos');
+          newGameBtnChaos = $('newGameBtnChaos'),
+          continueBtnJester = $('continueBtnJester'),
+          newGameBtnJester = $('newGameBtnJester');
 
     // === Helper Functions ===
     // Updates "Liczba oszustów" depending on # of players
@@ -346,7 +386,15 @@
                     total += BAZA_PYTAN[kategoria].length;
                 }
             });
-            totalWordsCount.textContent = total > 0 ? `(${total} haseł)` : '';
+            if (total === 0) {
+                totalWordsCount.textContent = '(brak haseł)';
+            } else if (total === 1) {
+                totalWordsCount.textContent = `(${total} hasło)`;
+            } else if (total < 5) {
+                totalWordsCount.textContent = `(${total} hasła)`;
+            } else {
+                totalWordsCount.textContent = `(${total} haseł)`;
+            }
         }
     }
 
@@ -403,11 +451,14 @@
         wszyscyOszusciEnabled = allOszusciCheckbox.checked;
         const chaosText = $('chaosOptionText');
         if (chaosText) {
-            if (wszyscyOszusciEnabled) {
-                chaosText.classList.add('chaos-active');
-            } else {
-                chaosText.classList.remove('chaos-active');
-            }
+            chaosText.classList.toggle('chaos-active', wszyscyOszusciEnabled);
+        }
+    };
+    jesterCheckbox.onchange = function() {
+        jesterEnabled = jesterCheckbox.checked;
+        const jesterText = $('jesterOptionText');
+        if (jesterText) {
+            jesterText.classList.toggle('jester-active', jesterEnabled);
         }
     };
 
@@ -423,22 +474,47 @@
             haslo = hasla[Math.floor(Math.random()*hasla.length)];
 
         let oszusci;
+        let jester = null; // maksymalnie 1 gracz z rolą Jester
+        
         if (wszyscyOszusci) {
             oszusci = gracze.slice();
         } else {
-            const shuffled = gracze.slice();
-            for(let i=shuffled.length-1; i>0; i--){
-                const j = Math.floor(Math.random()*(i+1));
-                [shuffled[i],shuffled[j]] = [shuffled[j],shuffled[i]];
+            // Fisher-Yates shuffle
+            const shuffled = [...gracze];
+            for(let i = shuffled.length - 1; i > 0; i--){
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
             }
-            oszusci = shuffled.slice(0,liczbaOszustow);
+            oszusci = shuffled.slice(0, liczbaOszustow);
         }
+        
+        // Losowanie Jester (jeśli opcja włączona i nie ma chaosu, 100% szansy na maksymalnie 1 gracza)
+        if (jesterEnabled && !wszyscyOszusci && gracze.length > 0) {
+            const pozostaliGracze = gracze.filter(g => !oszusci.includes(g));
+            if (pozostaliGracze.length > 0) {
+                // Losuj jednego gracza z pozostałych (nie-oszustów)
+                jester = pozostaliGracze[Math.floor(Math.random() * pozostaliGracze.length)];
+            }
+        }
+        
         graczeDane = {};
         gracze.forEach(g=>{
-            graczeDane[g] = {
-                rola: oszusci.includes(g) ? 'OSZUST':'GRACZ',
-                haslo: oszusci.includes(g) ? null : haslo,
-                kategoria, jestOszustem: oszusci.includes(g)
+            if (g === jester) {
+                graczeDane[g] = {
+                    rola: 'JESTER',
+                    haslo: null,
+                    kategoria,
+                    jestOszustem: false,
+                    jestJester: true
+                };
+            } else {
+                graczeDane[g] = {
+                    rola: oszusci.includes(g) ? 'OSZUST':'GRACZ',
+                    haslo: oszusci.includes(g) ? null : haslo,
+                    kategoria,
+                    jestOszustem: oszusci.includes(g),
+                    jestJester: false
+                };
             }
         });
         // Render player buttons
@@ -475,17 +551,24 @@
             const dane = graczeDane[gracz];
             aktualnieWidoczny = gracz;
             // Use template for minimal DOM construction
-            if(dane.jestOszustem) {
+            if(dane.jestJester) {
                 roleDisplay.innerHTML = `
                     <h2>${gracz}</h2>
-                    <div class="oszust-badge">❌ OSZUST</div>
+                    <div class="jester-badge">JESTER</div>
+                    <p><span class="category-tag">Kategoria: ${dane.kategoria}</span></p>
+                    <p style="margin-top:20px;color:rgba(255,255,255,.7);">Nie znasz hasła - musisz je odgadnąć!</p>
+                `;
+            } else if(dane.jestOszustem) {
+                roleDisplay.innerHTML = `
+                    <h2>${gracz}</h2>
+                    <div class="oszust-badge">OSZUST</div>
                     <p><span class="category-tag">Kategoria: ${dane.kategoria}</span></p>
                     <p style="margin-top:20px;color:rgba(255,255,255,.7);">Nie znasz hasła - musisz je odgadnąć!</p>
                 `;
             } else {
                 roleDisplay.innerHTML = `
                     <h2>${gracz}</h2>
-                    <div class="gracz-badge">✓ GRACZ</div>
+                    <div class="gracz-badge">GRACZ</div>
                     <div class="word-display">${dane.haslo}</div>
                     <p><span class="category-tag">Kategoria: ${dane.kategoria}</span></p>
                 `;
@@ -604,40 +687,39 @@
         showResults();
     };
 
-    // Show voting results
-    function showVotingResults() {
-        // Count votes
+    // Count votes (shared function)
+    function countVotes() {
         const voteCounts = {};
         gracze.forEach(g => voteCounts[g] = 0);
-        
         Object.values(glosy).forEach(votes => {
             votes.forEach(voted => {
                 voteCounts[voted] = (voteCounts[voted] || 0) + 1;
             });
         });
+        return voteCounts;
+    }
 
-        // Sort by votes
+    // Render voting results (shared function)
+    function renderVotingResults(voteCounts) {
         const sortedVotes = gracze.map(g => ({ 
             name: g, 
-            votes: voteCounts[g],
-            jestOszustem: graczeDane[g] && graczeDane[g].jestOszustem
-        }))
-            .sort((a, b) => b.votes - a.votes);
+            votes: voteCounts[g] || 0,
+            jestOszustem: graczeDane[g]?.jestOszustem,
+            jestJester: graczeDane[g]?.jestJester
+        })).sort((a, b) => b.votes - a.votes);
 
-        // Check top players (top 1 for 1 oszust, top 1-2 for 2 oszustów, top 1-3 for 3 oszustów)
         const topCount = liczbaOszustow;
-        const topPlayers = sortedVotes.slice(0, topCount);
-        const allTopWereOszusci = topPlayers.every(p => p.jestOszustem);
-
-        // Display voting results with role indicator and green highlight for correct top guesses
-        votingResultsList.innerHTML = sortedVotes.map((item, index) => {
-            const roleBadge = item.jestOszustem 
-                ? '<span style="color:#f5576c;font-weight:bold;">❌ OSZUST</span>' 
-                : '<span style="color:#667eea;font-weight:bold;">✓ GRACZ</span>';
+        return sortedVotes.map((item, index) => {
+            let roleBadge;
+            if (item.jestJester) {
+                roleBadge = '<span style="color:#f093fb;font-weight:bold;">JESTER</span>';
+            } else if (item.jestOszustem) {
+                roleBadge = '<span style="color:#f5576c;font-weight:bold;">OSZUST</span>';
+            } else {
+                roleBadge = '<span style="color:#4caf50;font-weight:bold;">GRACZ</span>';
+            }
             
-            // Check if this is in top and was oszust
-            const isTop = index < topCount;
-            const isCorrect = isTop && item.jestOszustem;
+            const isCorrect = index < topCount && item.jestOszustem;
             const bgColor = isCorrect 
                 ? 'background:rgba(76,175,80,0.3);border-color:rgba(76,175,80,0.6);' 
                 : 'background:rgba(102,126,234,0.2);border-color:rgba(102,126,234,0.4);';
@@ -646,65 +728,65 @@
                 ${item.name}: ${item.votes} ${item.votes === 1 ? 'głos' : 'głosów'} - ${roleBadge}
             </div>`;
         }).join('');
+    }
 
+    // Show voting results
+    function showVotingResults() {
+        const voteCounts = countVotes();
+        const sortedVotes = gracze.map(g => ({ 
+            name: g, 
+            votes: voteCounts[g] || 0,
+            jestJester: graczeDane[g]?.jestJester
+        })).sort((a, b) => b.votes - a.votes);
+
+        const topCount = liczbaOszustow;
+        const topPlayers = sortedVotes.slice(0, topCount);
+        
+        // Check if Jester was in top results
+        const jesterInTop = topPlayers.some(p => p.jestJester);
+        
+        if (jesterInTop) {
+            // Jester won - show jester win screen
+            showScreen('jesterWinScreen');
+            return;
+        }
+        
+        votingResultsList.innerHTML = renderVotingResults(voteCounts);
         showScreen('resultScreen');
     }
 
     // Show results without voting or with partial voting
     function showResults() {
-        // Check if there are any votes
         const hasVotes = Object.keys(glosy).length > 0;
-        
         if (hasVotes) {
-            // Count votes
-            const voteCounts = {};
-            gracze.forEach(g => voteCounts[g] = 0);
-            
-            Object.values(glosy).forEach(votes => {
-                votes.forEach(voted => {
-                    voteCounts[voted] = (voteCounts[voted] || 0) + 1;
-                });
-            });
-
-            // Sort by votes
+            const voteCounts = countVotes();
             const sortedVotes = gracze.map(g => ({ 
                 name: g, 
-                votes: voteCounts[g],
-                jestOszustem: graczeDane[g] && graczeDane[g].jestOszustem
-            }))
-                .sort((a, b) => b.votes - a.votes);
+                votes: voteCounts[g] || 0,
+                jestJester: graczeDane[g]?.jestJester
+            })).sort((a, b) => b.votes - a.votes);
 
-            // Check top players (top 1 for 1 oszust, top 1-2 for 2 oszustów, top 1-3 for 3 oszustów)
             const topCount = liczbaOszustow;
             const topPlayers = sortedVotes.slice(0, topCount);
-            const allTopWereOszusci = topPlayers.every(p => p.jestOszustem);
-
-            // Display voting results with role indicator and green highlight for correct top guesses
-            votingResultsList.innerHTML = sortedVotes.map((item, index) => {
-                const roleBadge = item.jestOszustem 
-                    ? '<span style="color:#f5576c;font-weight:bold;">❌ OSZUST</span>' 
-                    : '<span style="color:#667eea;font-weight:bold;">✓ GRACZ</span>';
-                
-                // Check if this is in top and was oszust
-                const isTop = index < topCount;
-                const isCorrect = isTop && item.jestOszustem;
-                const bgColor = isCorrect 
-                    ? 'background:rgba(76,175,80,0.3);border-color:rgba(76,175,80,0.6);' 
-                    : 'background:rgba(102,126,234,0.2);border-color:rgba(102,126,234,0.4);';
-                
-                return `<div class="result-item" style="${bgColor}">
-                    ${item.name}: ${item.votes} ${item.votes === 1 ? 'głos' : 'głosów'} - ${roleBadge}
-                </div>`;
-            }).join('');
+            
+            // Check if Jester was in top results
+            const jesterInTop = topPlayers.some(p => p.jestJester);
+            
+            if (jesterInTop) {
+                // Jester won - show jester win screen
+                showScreen('jesterWinScreen');
+                return;
+            }
+            
+            votingResultsList.innerHTML = renderVotingResults(voteCounts);
         } else {
             votingResultsList.innerHTML = '<div class="result-item" style="background:rgba(255,255,255,0.1);">Głosowanie pominięte</div>';
         }
-
         showScreen('resultScreen');
     }
 
-    // Continue Game
-    continueBtn.onclick = function() {
+    // Reset game state (shared function)
+    function resetGameState() {
         graczeDane = {}; 
         aktualnieWidoczny = null;
         glosy = {};
@@ -712,62 +794,69 @@
         wybraneDoGlosowania = [];
         czyChaos = false;
         endGameBtn.textContent = 'KONIEC GRY';
+    }
+
+    // Continue Game
+    continueBtn.onclick = function() {
+        resetGameState();
         showScreen('menuScreen');
     };
 
     // Continue Game from Chaos
     continueBtnChaos.onclick = function() {
-        graczeDane = {}; 
-        aktualnieWidoczny = null;
-        glosy = {};
-        aktualnyGlosujacy = 0;
-        wybraneDoGlosowania = [];
-        czyChaos = false;
-        endGameBtn.textContent = 'KONIEC GRY';
+        resetGameState();
         showScreen('menuScreen');
     };
 
-    // New Game (reset all)
-    newGameBtn.onclick = function() {
+    // Continue Game from Jester Win
+    continueBtnJester.onclick = function() {
+        resetGameState();
+        showScreen('menuScreen');
+    };
+
+    // Reset all game data (shared function)
+    function resetAllGameData() {
         gracze = [];
         liczbaOszustow = 1;
         graczeDane = {};
         aktualnieWidoczny = null;
         wybraneKategorie = new Set(Object.keys(BAZA_PYTAN));
         wszyscyOszusciEnabled = false;
+        jesterEnabled = false;
         czyChaos = false;
         glosy = {};
         aktualnyGlosujacy = 0;
         wybraneDoGlosowania = [];
         playerInput.value = '';
         allOszusciCheckbox.checked = false;
+        jesterCheckbox.checked = false;
         endGameBtn.textContent = 'KONIEC GRY';
         updatePlayersList();
         updateOszustyOptions();
         updateCategoryButtons();
         updateStartButton();
+        // Reset chaos and jester animations
+        const chaosText = $('chaosOptionText');
+        const jesterText = $('jesterOptionText');
+        if (chaosText) chaosText.classList.remove('chaos-active');
+        if (jesterText) jesterText.classList.remove('jester-active');
+    }
+
+    // New Game (reset all)
+    newGameBtn.onclick = function() {
+        resetAllGameData();
         showScreen('menuScreen');
     };
 
     // New Game from Chaos (reset all)
     newGameBtnChaos.onclick = function() {
-        gracze = [];
-        liczbaOszustow = 1;
-        graczeDane = {};
-        aktualnieWidoczny = null;
-        wybraneKategorie = new Set(Object.keys(BAZA_PYTAN));
-        wszyscyOszusciEnabled = false;
-        czyChaos = false;
-        glosy = {};
-        aktualnyGlosujacy = 0;
-        wybraneDoGlosowania = [];
-        playerInput.value = '';
-        allOszusciCheckbox.checked = false;
-        endGameBtn.textContent = 'KONIEC GRY';
-        updatePlayersList();
-        updateOszustyOptions();
-        updateCategoryButtons();
-        updateStartButton();
+        resetAllGameData();
+        showScreen('menuScreen');
+    };
+
+    // New Game from Jester Win (reset all)
+    newGameBtnJester.onclick = function() {
+        resetAllGameData();
         showScreen('menuScreen');
     };
 
@@ -782,10 +871,14 @@
     updatePlayersList();
     updateCategoryButtons();
     updateStartButton();
-    // Check initial state of chaos checkbox
+    // Check initial state of chaos and jester checkboxes
     const chaosText = $('chaosOptionText');
-    if (chaosText && allOszusciCheckbox.checked) {
-        chaosText.classList.add('chaos-active');
+    const jesterText = $('jesterOptionText');
+    if (chaosText) {
+        chaosText.classList.toggle('chaos-active', allOszusciCheckbox.checked);
+    }
+    if (jesterText) {
+        jesterText.classList.toggle('jester-active', jesterCheckbox.checked);
     }
 </script>
 </body>
