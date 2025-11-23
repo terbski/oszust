@@ -326,6 +326,28 @@
             background-size: 20px;
             padding-right: 40px;
         }
+
+        .category-btn {
+            padding: 12px;
+            font-size: 14px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.4) 0%, rgba(118, 75, 162, 0.4) 100%);
+            color: white;
+            border-radius: 10px;
+            border: 2px solid rgba(102, 126, 234, 0.6);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .category-btn.inactive {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body>
@@ -350,7 +372,25 @@
                 <label>Liczba oszustów:</label>
                 <select id="oszustySelect" onchange="updateOszusty()">
                     <option value="1">1</option>
+                    <option value="1">2</option>
+                    <option value="1">3</option>
                 </select>
+            </div>
+
+            <div class="input-group">
+                <label>Wybierz kategorie:</label>
+                <div id="categoryButtons" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 10px;">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="allOszusciCheckbox" onchange="toggleAllOszusci()" style="width: 20px; height: 20px; cursor: pointer; accent-color: #f5576c;">
+                    <span>Troll opcja</span>
+                </label>
+                <p style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 5px; font-style: italic;">
+                    Jeśli włączone, jest 25% szans że wszyscy gracze będą oszustami!
+                </p>
             </div>
 
             <button class="btn-primary" id="startBtn" onclick="startGame()" disabled>START GRY</button>
@@ -377,6 +417,7 @@
             <h2>Oszuści:</h2>
             <div class="results-list" id="oszusciList"></div>
 
+            <button class="btn-primary" onclick="continueGame()" style="margin-bottom: 10px;">KONTYNUUJ GRĘ</button>
             <button class="btn-primary" onclick="newGame()">NOWA GRA</button>
         </div>
     </div>
@@ -386,9 +427,7 @@
         const BAZA_PYTAN = {
             "Jedzenie i picie": ["Pizza", "Bimber", "Sushi", "Hamburger", "Spaghetti", "Lody", "Pierogi", "Kebab", "Arbuz", "Truskawka", "Brokuł", "Donut z cukrem", "Makaron", "Grochówka", "Pomidorowa", "Coca-cola", "Ser", "Herbata", "Kawa", "Matcha", "Kakao", "Kompot", "Masło", "Miód", "Cynamon", "Szarlotka", "Sernik", "Nachosy", "Popcorn", "Szpinak", "Rodzynki", "Orzechy laskowe", "Ogórkowa", "Rosół", "Whiskey", "Wódka", "Piwo", "Piwo zero", "Woda", "Cebularz"],
             "Filmy": ["Titanic", "Avatar", "Gladiator", "Matrix", "Shrek", "Joker", "Interstellar", "Furioza", "Pulp Fiction", "Ojciec chrzestny"],
-            "Przedmioty": ["Tłok", "Krzesło", "Stół", "Lampa", "Telefon", "Komputer", "Klawiatura", "Myszka", "Monitor", "Zeszyt", "Długopis",
-"Poduszka", "Koc", "Łóżko", "Szafa", "Lustro", "Zegar", "Dywan", "Zasłona", "Doniczka", "Kwiat", "Pilot", "Telewizor",
-"Słuchawki", "Głośnik", "Mikrofon", "Ładowarka", "Kabel", "Pendrive", "Powerbank", "Klucze", "Portfel", "Dokumenty", "Karta", "Okulary", "Etui", "Parasol", "Torba", "Walizka", "Czapka", "Kurtka", "Rękawiczki", "Skarpety", "Buty", "Pasek", "Szalik"],
+            "Przedmioty": ["Tłok", "Krzesło", "Stół", "Lampa", "Telefon", "Komputer", "Klawiatura", "Myszka", "Monitor", "Zeszyt", "Długopis", "Poduszka", "Koc", "Łóżko", "Szafa", "Lustro", "Zegar", "Dywan", "Zasłona", "Doniczka", "Kwiat", "Pilot", "Telewizor", "Słuchawki", "Głośnik", "Mikrofon", "Ładowarka", "Kabel", "Pendrive", "Powerbank", "Klucze", "Portfel", "Dokumenty", "Karta", "Okulary", "Etui", "Parasol", "Torba", "Walizka", "Czapka", "Kurtka", "Rękawiczki", "Skarpety", "Buty", "Pasek", "Szalik"],
             "Zwierzęta": ["Papuga", "Jednorożec","Kot", "Pies", "Słoń", "Delfin", "Orzeł", "Lew", "Pingwin", "Koala", "Ślimak"],
             "Zawody": ["Lekarz", "Nauczyciel", "Strażak", "Pilot", "Kucharz", "Prawnik", "Programista", "Aktor"],
             "Sport": ["Piłka nożna", "Koszykówka", "Siatkówka", "Tenis", "Tenis stołowy", "Piłka ręczna", "Pływanie", "Skoki do wody", "Nurkuowanie", "Łucznictwo", "Łyżwiarstwo figurowe", "Snowboard", "Skoki narciarskie", "Lekkoatletyka", "Bieganie", "Sprint", "Skok wzwyż", "Rzut młotem", "Rzut dyskiem", "Trampolina", "Akrobatyka", "Judo", "Karate", "Boks", "Kickboxing", "Kolarstwo torowe", "Kolarstwo szosowe", "Kolarstwo górskie", "Rzut kulą", "Siatkówka plażowa", "Mini golf", "Skateboarding", "Skoki spadochronowe", "Kulturystyka","Siłownia", "Przysiady", "Podciąganie"]
@@ -398,6 +437,8 @@
         let liczbaOszustow = 1;
         let graczeDane = {};
         let aktualnieWidoczny = null;
+        let wybraneKategorie = new Set(Object.keys(BAZA_PYTAN));
+        let wszyscyOszusciEnabled = false;
 
         // Dodaj gracza
         function addPlayer() {
@@ -440,7 +481,7 @@
         // Aktualizuj opcje oszustów
         function updateOszustyOptions() {
             const select = document.getElementById('oszustySelect');
-            const maxOszustow = Math.max(1, 3);
+            const maxOszustow = Math.min(3, Math.max(1, gracze.length - 1));
             
             select.innerHTML = '';
             for (let i = 1; i <= maxOszustow; i++) {
@@ -464,7 +505,7 @@
         // Aktualizuj przycisk start
         function updateStartButton() {
             const btn = document.getElementById('startBtn');
-            btn.disabled = gracze.length < 3;
+            btn.disabled = gracze.length < 3 || wybraneKategorie.size === 0;
         }
 
         // Enter aby dodać gracza
@@ -474,19 +515,65 @@
             }
         });
 
+        // Inicjalizuj przyciski kategorii
+        function initCategoryButtons() {
+            const container = document.getElementById('categoryButtons');
+            const kategorie = Object.keys(BAZA_PYTAN);
+            
+            container.innerHTML = kategorie.map(kategoria => `
+                <button class="category-btn" data-category="${kategoria}" onclick="toggleCategory('${kategoria}', this)">
+                    ✓ ${kategoria}
+                </button>
+            `).join('');
+        }
+
+        // Przełącz kategorię
+        function toggleCategory(kategoria, btn) {
+            if (wybraneKategorie.has(kategoria)) {
+                wybraneKategorie.delete(kategoria);
+                btn.classList.add('inactive');
+                btn.textContent = kategoria;
+            } else {
+                wybraneKategorie.add(kategoria);
+                btn.classList.remove('inactive');
+                btn.textContent = '✓ ' + kategoria;
+            }
+            updateStartButton();
+        }
+
+        // Przełącz tryb "wszyscy oszuści"
+        function toggleAllOszusci() {
+            wszyscyOszusciEnabled = document.getElementById('allOszusciCheckbox').checked;
+        }
+
+        // Inicjalizuj przy załadowaniu
+        initCategoryButtons();
+
         // Rozpocznij grę
         function startGame() {
-            if (gracze.length < 3) return;
+            if (gracze.length < 3 || wybraneKategorie.size === 0) return;
 
-            // Losuj kategorię i hasło
-            const kategorie = Object.keys(BAZA_PYTAN);
-            const kategoria = kategorie[Math.floor(Math.random() * kategorie.length)];
+            // Sprawdź czy włączony tryb "wszyscy oszuści" i losuj 25% szans
+            let wszyscyOszusci = false;
+            if (wszyscyOszusciEnabled && Math.random() < 0.25) {
+                wszyscyOszusci = true;
+            }
+
+            // Losuj kategorię tylko z wybranych
+            const dostepneKategorie = Array.from(wybraneKategorie);
+            const kategoria = dostepneKategorie[Math.floor(Math.random() * dostepneKategorie.length)];
             const hasla = BAZA_PYTAN[kategoria];
             const haslo = hasla[Math.floor(Math.random() * hasla.length)];
 
-            // Losuj oszustów
-            const shuffled = [...gracze].sort(() => Math.random() - 0.5);
-            const oszusci = shuffled.slice(0, liczbaOszustow);
+            let oszusci;
+            if (wszyscyOszusci) {
+                // Wszyscy są oszustami
+                oszusci = [...gracze];
+            } else {
+                // Losuj oszustów normalnie
+                const shuffled = [...gracze].sort(() => Math.random() - 0.5);
+                oszusci = shuffled.slice(0, liczbaOszustow);
+            }
 
             // Przypisz role
             graczeDane = {};
@@ -564,16 +651,28 @@
             showScreen('resultScreen');
         }
 
-        // Nowa gra
+        // Kontynuuj grę (zachowuje graczy)
+        function continueGame() {
+            graczeDane = {};
+            aktualnieWidoczny = null;
+            
+            showScreen('menuScreen');
+        }
+
+        // Nowa gra (resetuje wszystko)
         function newGame() {
             gracze = [];
             liczbaOszustow = 1;
             graczeDane = {};
             aktualnieWidoczny = null;
+            wybraneKategorie = new Set(Object.keys(BAZA_PYTAN));
+            wszyscyOszusciEnabled = false;
             
             document.getElementById('playerInput').value = '';
+            document.getElementById('allOszusciCheckbox').checked = false;
             updatePlayersList();
             updateOszustyOptions();
+            initCategoryButtons();
             updateStartButton();
             
             showScreen('menuScreen');
