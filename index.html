@@ -390,7 +390,8 @@
 "Poduszka", "Koc", "Łóżko", "Szafa", "Lustro", "Zegar", "Dywan", "Zasłona", "Doniczka", "Kwiat", "Pilot", "Telewizor",
 "Słuchawki", "Głośnik", "Mikrofon", "Ładowarka", "Kabel", "Pendrive", "Powerbank", "Klucze", "Portfel", "Dokumenty", "Karta", "Okulary", "Etui", "Parasol", "Torba", "Walizka", "Czapka", "Kurtka", "Rękawiczki", "Skarpety", "Buty", "Pasek", "Szalik"],
             "Zwierzęta": ["Papuga", "Jednorożec","Kot", "Pies", "Słoń", "Delfin", "Orzeł", "Lew", "Pingwin", "Koala", "Ślimak"],
-            "Zawody": ["Lekarz", "Nauczyciel", "Strażak", "Pilot", "Kucharz", "Prawnik", "Programista", "Aktor"]
+            "Zawody": ["Lekarz", "Nauczyciel", "Strażak", "Pilot", "Kucharz", "Prawnik", "Programista", "Aktor"],
+            "Sport": ["Piłka nożna", "Koszykówka", "Siatkówka", "Tenis", "Tenis stołowy", "Piłka ręczna", "Pływanie", "Skoki do wody", "Nurkuowanie", "Łucznictwo", "Łyżwiarstwo figurowe", "Snowboard", "Skoki narciarskie", "Lekkoatletyka", "Bieganie", "Sprint", "Skok wzwyż", "Rzut młotem", "Rzut dyskiem", "Trampolina", "Akrobatyka", "Judo", "Karate", "Boks", "Kickboxing", "Kolarstwo torowe", "Kolarstwo szosowe", "Kolarstwo górskie", "Rzut kulą", "Siatkówka plażowa", "Mini golf", "Skateboarding", "Skoki spadochronowe", "Kulturystyka","Siłownia", "Przysiady", "Podciąganie"]
         };
 
         let gracze = [];
@@ -514,7 +515,7 @@
             `).join('');
 
             aktualnieWidoczny = null;
-            document.getElementById('roleDisplay').innerHTML = '<p>👆 Wybierz swoje imię powyżej</p>';
+            document.getElementById('roleDisplay').innerHTML = '<p>Wybierz swoje imię powyżej</p>';
             
             showScreen('gameScreen');
         }
@@ -525,7 +526,7 @@
             
             if (aktualnieWidoczny === gracz) {
                 // Ukryj i usuń przycisk
-                display.innerHTML = '<p>👆 Wybierz swoje imię powyżej</p>';
+                display.innerHTML = '<p>Wybierz swoje imię poniżej</p>';
                 aktualnieWidoczny = null;
                 btn.remove();
             } else {
