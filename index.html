@@ -7,684 +7,786 @@
     <meta name="mobile-web-app-capable" content="yes">
     <title>Gra Oszust</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        /* CSS: some repeated selectors merged and optimized, order minimally changed for specificity */
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-            color: white;
+            font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+            background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);
+            min-height:100vh; display:flex; justify-content:center; align-items:center;
+            padding:10px; color:#fff;
         }
-
         .container {
-            width: 100%;
-            max-width: 500px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            width:100%; max-width:500px; background:rgba(255,255,255,0.05);
+            backdrop-filter:blur(10px);
+            border-radius:20px; padding:20px;
+            box-shadow:0 8px 32px rgba(0,0,0,.4);
+            border:1px solid rgba(255,255,255,.1);
         }
-
-        .screen {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
+        .screen { display:none; animation:fadeIn .3s ease; }
+        .screen.active { display:block; }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity:0; transform:translateY(10px);}
+            to   { opacity:1; transform:translateY(0);}
         }
-
         h1 {
-            text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            text-align:center; font-size:2.5em; margin-bottom:20px;
+            text-shadow:2px 2px 8px rgba(0,0,0,.5);
+            background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
         }
-
-        h2 {
-            text-align: center;
-            font-size: 1.5em;
-            margin-bottom: 15px;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
+        h2 { text-align:center;font-size:1.5em; margin-bottom:15px; }
+        .input-group { margin-bottom:15px; }
+        label { display:block; margin-bottom:8px; font-weight:bold; font-size:14px; }
         input[type="text"], input[type="number"], select {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            width:100%; padding:14px; border-radius:12px; font-size:16px;
+            background:rgba(255,255,255,0.15); color:#fff;
+            border:1px solid rgba(255,255,255,0.2); border:none;
         }
-
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .input-with-btn {
-            display: flex;
-            gap: 10px;
-        }
-
-        .input-with-btn input {
-            flex: 1;
-        }
-
+        input::placeholder { color:rgba(255,255,255,.6);}
+        .input-with-btn { display:flex; gap:10px;}
+        .input-with-btn input {flex:1;}
         button {
-            padding: 14px 24px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding:14px 24px; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer; transition:.3s all;
+            background:rgba(255,255,255,0.2); color:#fff; border:1px solid rgba(255,255,255,.3); border:none;
         }
-
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.3);
+            transform:translateY(-2px);
+            box-shadow:0 6px 20px rgba(255,255,255,.2); background:rgba(255,255,255,0.3);
         }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            transform: none;
-        }
-
+        button:active { transform:translateY(0);}
+        button:disabled {opacity:.3; cursor:not-allowed; transform:none;}
         .btn-primary {
-            width: 100%;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 16px;
-            font-size: 18px;
-            margin-top: 10px;
-            border: none;
+            width:100%; background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);
+            color:#fff; padding:16px; font-size:18px; margin-top:10px; border:none;
         }
-
         .btn-add {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            min-width: 80px;
+            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            color:#fff; min-width:80px;
         }
-
         .btn-remove {
-            padding: 6px 12px;
-            font-size: 13px;
-            background: rgba(245, 87, 108, 0.8);
-            color: white;
+            padding:6px 12px; font-size:13px;
+            background:rgba(245,87,108,0.8); color:#fff;
         }
-
         .players-list {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 15px 0;
-            min-height: 120px;
-            max-height: 250px;
-            overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background:rgba(255,255,255,0.05); border-radius:12px; padding:15px; margin:15px 0;
+            min-height:120px; max-height:250px; overflow-y:auto;
+            border:1px solid rgba(255,255,255,0.1);
         }
-
-        .players-list::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .players-list::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-
-        .players-list::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-        }
-
+        .players-list::-webkit-scrollbar { width:8px;}
+        .players-list::-webkit-scrollbar-track { background:rgba(255,255,255,0.05); border-radius:10px;}
+        .players-list::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.2); border-radius:10px;}
         .player-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px 15px;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background:rgba(255,255,255,.1); padding:10px 15px; border-radius:10px; margin-bottom:8px;
+            display:flex; justify-content:space-between; align-items:center;
+            border:1px solid rgba(255,255,255,.15);
         }
-
-        .empty-state {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.5);
-            padding: 30px;
-            font-style: italic;
-        }
-
+        .empty-state {text-align:center;color:rgba(255,255,255,0.5);padding:30px;font-style:italic;}
         .player-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin: 20px 0;
-            max-height: 400px;
-            overflow-y: auto;
-            padding: 5px;
+            display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;
+            margin:20px 0; max-height:400px; overflow-y:auto; padding:5px;
         }
-
         .player-btn {
-            padding: 25px 15px;
-            font-size: 18px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
-            color: white;
-            border-radius: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s;
+            padding:25px 15px; font-size:18px;
+            background:linear-gradient(135deg,rgba(102,126,234,0.3) 0%,rgba(118,75,162,0.3) 100%);
+            color:#fff; border-radius:15px; border:2px solid rgba(255,255,255,0.2); transition:.3s all;
         }
-
         .player-btn:hover {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.5) 0%, rgba(118, 75, 162, 0.5) 100%);
-            border-color: rgba(255, 255, 255, 0.4);
+            background:linear-gradient(135deg,rgba(102,126,234,0.5) 0%,rgba(118,75,162,0.5) 100%);
+            border-color:rgba(255,255,255,.4);
         }
-
+        .player-btn.selected {
+            background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);
+            border-color:rgba(240,147,251,0.8);
+            box-shadow:0 4px 15px rgba(240,147,251,0.4);
+        }
         .role-display {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 30px 20px;
-            margin: 20px 0;
-            text-align: center;
-            min-height: 180px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 2px solid rgba(255, 255, 255, 0.15);
+            background:rgba(255,255,255,0.05); border-radius:15px; padding:30px 20px; margin:20px 0;
+            text-align:center; min-height:180px; display:flex; flex-direction:column; justify-content:center; align-items:center;
+            border:2px solid rgba(255,255,255,0.15);
         }
-
-        .role-display h2 {
-            font-size: 2.2em;
-            margin-bottom: 15px;
-        }
-
-        .role-display p {
-            font-size: 1.2em;
-            margin: 8px 0;
-            line-height: 1.6;
-        }
-
-        .role-display strong {
-            color: #f093fb;
-        }
-
+        .role-display h2 { font-size:2.2em; margin-bottom:15px;}
+        .role-display p {font-size:1.2em;margin:8px 0;line-height:1.6;}
+        .role-display strong{ color:#f093fb;}
         .oszust-badge {
-            background: linear-gradient(135deg, #f5576c 0%, #c92a3e 100%);
-            padding: 8px 20px;
-            border-radius: 25px;
-            display: inline-block;
-            margin: 10px 0;
-            font-size: 1.3em;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+            background:linear-gradient(135deg,#f5576c 0%,#c92a3e 100%);
+            padding:8px 20px; border-radius:25px; display:inline-block; margin:10px 0;
+            font-size:1.3em; font-weight:bold; box-shadow:0 4px 15px rgba(245,87,108,0.4);
         }
-
         .gracz-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 8px 20px;
-            border-radius: 25px;
-            display: inline-block;
-            margin: 10px 0;
-            font-size: 1.3em;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            padding:8px 20px; border-radius:25px; display:inline-block; margin:10px 0;
+            font-size:1.3em; font-weight:bold; box-shadow:0 4px 15px rgba(102,126,234,.4);
         }
-
         .category-tag {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 6px 15px;
-            border-radius: 20px;
-            display: inline-block;
-            margin: 5px 0;
-            font-size: 0.9em;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background:rgba(255,255,255,0.15); padding:6px 15px; border-radius:20px; display:inline-block; margin:5px 0;
+            font-size:.9em; border:1px solid rgba(255,255,255,.2);
         }
-
         .word-display {
-            font-size: 2em;
-            font-weight: bold;
-            color: #f093fb;
-            margin: 15px 0;
-            text-shadow: 0 2px 10px rgba(240, 147, 251, 0.5);
+            font-size:2em;font-weight:bold;color:#f093fb;margin:15px 0;
+            text-shadow:0 2px 10px rgba(240,147,251,0.5);
         }
-
         .results-list {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background:rgba(255,255,255,0.05); border-radius:12px; padding:20px; margin:20px 0;
+            border:1px solid rgba(255,255,255,0.1);
         }
-
         .result-item {
-            background: rgba(245, 87, 108, 0.2);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            font-size: 1.3em;
-            text-align: center;
-            border: 2px solid rgba(245, 87, 108, 0.4);
+            background:rgba(245,87,108,0.2); padding:15px; border-radius:10px; margin-bottom:10px;
+            font-size:1.3em; text-align:center; border:2px solid rgba(245,87,108,0.4);
         }
-
         .instruction {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.95em;
-            margin: 10px 0;
-            font-style: italic;
+            text-align:center;color:rgba(255,255,255,0.7);font-size:.95em;margin:10px 0;font-style:italic;
         }
-
         select {
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 20px;
-            padding-right: 40px;
+            cursor:pointer; appearance:none;
+            background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat:no-repeat; background-position:right 12px center; background-size:20px; padding-right:40px;
         }
-
         .category-btn {
-            padding: 12px;
-            font-size: 14px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.4) 0%, rgba(118, 75, 162, 0.4) 100%);
-            color: white;
-            border-radius: 10px;
-            border: 2px solid rgba(102, 126, 234, 0.6);
-            transition: all 0.3s;
-            cursor: pointer;
+            padding:12px; font-size:14px;
+            background:linear-gradient(135deg,rgba(102,126,234,0.4) 0%,rgba(118,75,162,0.4) 100%);
+            color:#fff; border-radius:10px; border:2px solid rgba(102,126,234,.6);
+            transition:all .3s; cursor:pointer;
         }
-
         .category-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            transform:translateY(-2px);
+            box-shadow:0 6px 20px rgba(102,126,234,0.3);
         }
-
         .category-btn.inactive {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            opacity: 0.5;
+            background:rgba(255,255,255,0.1);
+            border:2px solid rgba(255,255,255,0.2);
+            opacity:0.5;
+        }
+        @keyframes chaosColor {
+            0% { color: #f5576c; }
+            25% { color: #f093fb; }
+            50% { color: #667eea; }
+            75% { color: #f5576c; }
+            100% { color: #f093fb; }
+        }
+        #chaosOptionText.chaos-active {
+            animation: chaosColor 2s ease-in-out infinite;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Ekran Menu -->
-        <div id="menuScreen" class="screen active">
-            <h1>🎭 GRA OSZUST</h1>
-            
-            <div class="input-group">
-                <label>Dodaj graczy (minimum 3):</label>
-                <div class="input-with-btn">
-                    <input type="text" id="playerInput" placeholder="Wpisz imię gracza" maxlength="20">
-                    <button class="btn-add" onclick="addPlayer()">Dodaj</button>
-                </div>
+<div class="container">
+    <!-- Ekran Menu -->
+    <div id="menuScreen" class="screen active">
+        <h1>🎭OSZUST - GRA SŁOWNA</h1>
+        <div class="input-group">
+            <label>Dodaj graczy (minimum 3): <span id="playerCount" style="color:#f093fb;font-weight:bold;">(0)</span></label>
+            <div class="input-with-btn">
+                <input type="text" id="playerInput" placeholder="Wpisz imię gracza" maxlength="20" autocomplete="off">
+                <button class="btn-add" id="addPlayerBtn">Dodaj</button>
             </div>
-
-            <div class="players-list" id="playersList">
-                <div class="empty-state">Brak graczy - dodaj pierwszego!</div>
-            </div>
-
-            <div class="input-group">
-                <label>Liczba oszustów:</label>
-                <select id="oszustySelect" onchange="updateOszusty()">
-                    <option value="1">1</option>
-                    <option value="1">2</option>
-                    <option value="1">3</option>
-                </select>
-            </div>
-
-            <div class="input-group">
-                <label>Wybierz kategorie:</label>
-                <div id="categoryButtons" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 10px;">
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none;">
-                    <input type="checkbox" id="allOszusciCheckbox" onchange="toggleAllOszusci()" style="width: 20px; height: 20px; cursor: pointer; accent-color: #f5576c;">
-                    <span>Troll opcja</span>
-                </label>
-                <p style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 5px; font-style: italic;">
-                    Jeśli włączone, jest 25% szans że wszyscy gracze będą oszustami!
-                </p>
-            </div>
-
-            <button class="btn-primary" id="startBtn" onclick="startGame()" disabled>START GRY</button>
         </div>
-
-        <!-- Ekran Gry -->
-        <div id="gameScreen" class="screen">
-            <h2>Kliknij swoje imię, aby zobaczyć rolę</h2>
-            <p class="instruction">Po zobaczeniu roli, kliknij ponownie aby ukryć</p>
-            
-            <div class="role-display" id="roleDisplay">
-                <p>Wybierz swoje imię poniżej</p>
-            </div>
-
-            <div class="player-buttons" id="playerButtons"></div>
-
-            <button class="btn-primary" onclick="endGame()">KONIEC GRY</button>
+        <div class="players-list" id="playersList">
+            <div class="empty-state">Brak graczy - dodaj pierwszego!</div>
         </div>
-
-        <!-- Ekran Wyników -->
-        <div id="resultScreen" class="screen">
-            <h1>🎯 KONIEC GRY</h1>
-            
-            <h2>Oszuści:</h2>
-            <div class="results-list" id="oszusciList"></div>
-
-            <button class="btn-primary" onclick="continueGame()" style="margin-bottom: 10px;">KONTYNUUJ GRĘ</button>
-            <button class="btn-primary" onclick="newGame()">NOWA GRA</button>
+        <div class="input-group">
+            <label>Liczba oszustów:</label>
+            <select id="oszustySelect"></select>
         </div>
+        <div class="input-group">
+            <label>Wybierz kategorie: <span id="totalWordsCount" style="color:#f093fb;font-weight:bold;"></span></label>
+            <div id="categoryButtons" style="display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-top:10px;"></div>
+        </div>
+        <div class="input-group">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
+                <input type="checkbox" id="allOszusciCheckbox" style="width:20px;height:20px;cursor:pointer;accent-color:#f5576c;">
+                <span id="chaosOptionText">Opcja Chaosu</span>
+            </label>
+            <p style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:5px;font-style:italic;">
+                Jeśli włączone, jest 25% szans że wszyscy gracze będą oszustami!
+            </p>
+        </div>
+        <button class="btn-primary" id="startBtn" disabled>START GRY</button>
     </div>
+    <!-- Ekran Gry -->
+    <div id="gameScreen" class="screen">
+        <h2>Kliknij swoje imię, aby zobaczyć rolę</h2>
+        <p class="instruction">Po zobaczeniu roli, kliknij ponownie aby ukryć</p>
+        <div class="role-display" id="roleDisplay">
+            <p>Wybierz swoje imię poniżej</p>
+        </div>
+        <div class="player-buttons" id="playerButtons"></div>
+        <button class="btn-primary" id="endGameBtn">KONIEC GRY</button>
+    </div>
+    <!-- Ekran Głosowania -->
+    <div id="votingScreen" class="screen">
+        <h2>🗳️ ETAP GŁOSOWANIA</h2>
+        <div class="role-display" id="votingDisplay">
+            <h2 id="currentVoterName"></h2>
+            <p id="votingInstruction"></p>
+        </div>
+        <div class="player-buttons" id="votingButtons"></div>
+        <div id="selectedVotes" style="margin:15px 0;min-height:50px;"></div>
+        <button class="btn-primary" id="submitVoteBtn" disabled>ZATWIERDŹ GŁOS</button>
+        <button class="btn-primary" id="skipVotingBtn" style="margin-top:10px;background:rgba(255,255,255,0.1);">POMIŃ GŁOSOWANIE</button>
+    </div>
+    <!-- Ekran Wyników -->
+    <div id="resultScreen" class="screen">
+        <h1>🎯 KONIEC GRY</h1>
+        <h2>Wyniki głosowania:</h2>
+        <div class="results-list" id="votingResultsList"></div>
+        <button class="btn-primary" id="continueBtn" style="margin-bottom:10px;">KONTYNUUJ GRĘ</button>
+        <button class="btn-primary" id="newGameBtn">NOWA GRA</button>
+    </div>
+    <!-- Ekran Chaos -->
+    <div id="chaosScreen" class="screen">
+        <h1 style="font-size:4em;margin:30px 0;">CHAOS</h1>
+        <div class="role-display" style="min-height:200px;">
+            <p style="font-size:1.5em;margin:20px 0;">Wszyscy gracze byli oszustami!</p>
+        </div>
+        <button class="btn-primary" id="continueBtnChaos" style="margin-bottom:10px;">KONTYNUUJ GRĘ</button>
+        <button class="btn-primary" id="newGameBtnChaos">NOWA GRA</button>
+    </div>
+</div>
 
-    <script>
-        // Baza pytań według kategorii
-        const BAZA_PYTAN = {
-            "Jedzenie i picie": ["Pizza", "Bimber", "Sushi", "Hamburger", "Spaghetti", "Lody", "Pierogi", "Kebab", "Arbuz", "Truskawka", "Brokuł", "Donut z cukrem", "Makaron", "Grochówka", "Pomidorowa", "Coca-cola", "Ser", "Herbata", "Kawa", "Matcha", "Kakao", "Kompot", "Masło", "Miód", "Cynamon", "Szarlotka", "Sernik", "Nachosy", "Popcorn", "Szpinak", "Rodzynki", "Orzechy laskowe", "Ogórkowa", "Rosół", "Whiskey", "Wódka", "Piwo", "Piwo zero", "Woda", "Cebularz"],
-            "Filmy": ["Titanic", "Avatar", "Gladiator", "Matrix", "Shrek", "Joker", "Interstellar", "Furioza", "Pulp Fiction", "Ojciec chrzestny"],
-            "Przedmioty": ["Tłok", "Krzesło", "Stół", "Lampa", "Telefon", "Komputer", "Klawiatura", "Myszka", "Monitor", "Zeszyt", "Długopis", "Poduszka", "Koc", "Łóżko", "Szafa", "Lustro", "Zegar", "Dywan", "Zasłona", "Doniczka", "Kwiat", "Pilot", "Telewizor", "Słuchawki", "Głośnik", "Mikrofon", "Ładowarka", "Kabel", "Pendrive", "Powerbank", "Klucze", "Portfel", "Dokumenty", "Karta", "Okulary", "Etui", "Parasol", "Torba", "Walizka", "Czapka", "Kurtka", "Rękawiczki", "Skarpety", "Buty", "Pasek", "Szalik"],
-            "Zwierzęta": ["Papuga", "Jednorożec","Kot", "Pies", "Słoń", "Delfin", "Orzeł", "Lew", "Pingwin", "Koala", "Ślimak"],
-            "Zawody": ["Lekarz", "Nauczyciel", "Strażak", "Pilot", "Kucharz", "Prawnik", "Programista", "Aktor"],
-            "Sport": ["Piłka nożna", "Koszykówka", "Siatkówka", "Tenis", "Tenis stołowy", "Piłka ręczna", "Pływanie", "Skoki do wody", "Nurkuowanie", "Łucznictwo", "Łyżwiarstwo figurowe", "Snowboard", "Skoki narciarskie", "Lekkoatletyka", "Bieganie", "Sprint", "Skok wzwyż", "Rzut młotem", "Rzut dyskiem", "Trampolina", "Akrobatyka", "Judo", "Karate", "Boks", "Kickboxing", "Kolarstwo torowe", "Kolarstwo szosowe", "Kolarstwo górskie", "Rzut kulą", "Siatkówka plażowa", "Mini golf", "Skateboarding", "Skoki spadochronowe", "Kulturystyka","Siłownia", "Przysiady", "Podciąganie"]
-        };
+<script>
+    // === Data and State ===
+    const BAZA_PYTAN = {
+        "Jedzenie i picie": ["Pizza", "Bimber", "Sushi", "Hamburger", "Spaghetti", "Lody", "Pierogi", "Kebab", "Arbuz", "Truskawka", "Brokuł", "Donut z cukrem", "Makaron", "Grochówka", "Pomidorowa", "Coca-cola", "Ser", "Herbata", "Kawa", "Matcha", "Kakao", "Kompot", "Masło", "Miód", "Cynamon", "Szarlotka", "Sernik", "Nachosy", "Popcorn", "Szpinak", "Rodzynki", "Orzechy laskowe", "Ogórkowa", "Rosół", "Whiskey", "Wódka", "Piwo", "Piwo zero", "Woda", "Cebularz"],
+        "Filmy": ["Titanic", "Avatar", "Gladiator", "Matrix", "Shrek", "Joker", "Interstellar", "Furioza", "Pulp Fiction", "Ojciec chrzestny"],
+        "Przedmioty": ["Tłok", "Krzesło", "Stół", "Lampa", "Telefon", "Komputer", "Klawiatura", "Myszka", "Monitor", "Zeszyt", "Długopis", "Poduszka", "Koc", "Łóżko", "Szafa", "Lustro", "Zegar", "Dywan", "Zasłona", "Doniczka", "Kwiat", "Pilot", "Telewizor", "Słuchawki", "Głośnik", "Mikrofon", "Ładowarka", "Kabel", "Pendrive", "Powerbank", "Klucze", "Portfel", "Dokumenty", "Karta", "Okulary", "Etui", "Parasol", "Torba", "Walizka", "Czapka", "Kurtka", "Rękawiczki", "Skarpety", "Buty", "Pasek", "Szalik"],
+        "Zwierzęta": ["Papuga", "Jednorożec", "Kot", "Pies", "Słoń", "Delfin", "Orzeł", "Lew", "Pingwin", "Koala", "Ślimak"],
+        "Zawody": ["Lekarz", "Nauczyciel", "Strażak", "Pilot", "Kucharz", "Prawnik", "Programista", "Aktor"],
+        "Sport": ["Piłka nożna", "Koszykówka", "Siatkówka", "Tenis", "Tenis stołowy", "Piłka ręczna", "Pływanie", "Skoki do wody", "Nurkuowanie", "Łucznictwo", "Łyżwiarstwo figurowe", "Snowboard", "Skoki narciarskie", "Lekkoatletyka", "Bieganie", "Sprint", "Skok wzwyż", "Rzut młotem", "Rzut dyskiem", "Trampolina", "Akrobatyka", "Judo", "Karate", "Boks", "Kickboxing", "Kolarstwo torowe", "Kolarstwo szosowe", "Kolarstwo górskie", "Rzut kulą", "Siatkówka plażowa", "Mini golf", "Skateboarding", "Skoki spadochronowe", "Kulturystyka", "Siłownia", "Przysiady", "Podciąganie"]
+    };
 
-        let gracze = [];
-        let liczbaOszustow = 1;
-        let graczeDane = {};
-        let aktualnieWidoczny = null;
-        let wybraneKategorie = new Set(Object.keys(BAZA_PYTAN));
-        let wszyscyOszusciEnabled = false;
+    let gracze = [], liczbaOszustow = 1, graczeDane = {}, aktualnieWidoczny = null;
+    let wybraneKategorie = new Set(Object.keys(BAZA_PYTAN));
+    let wszyscyOszusciEnabled = false;
+    let czyChaos = false; // czy wszyscy są oszustami (opcja chaos)
+    let glosy = {}; // {gracz: [lista zagłosowanych]}
+    let aktualnyGlosujacy = 0; // indeks w tablicy gracze
+    let wybraneDoGlosowania = []; // tymczasowa lista wybranych do głosowania
 
-        // Dodaj gracza
-        function addPlayer() {
-            const input = document.getElementById('playerInput');
-            const imie = input.value.trim();
-            
-            if (imie && !gracze.includes(imie)) {
-                gracze.push(imie);
-                input.value = '';
-                updatePlayersList();
-                updateOszustyOptions();
-                updateStartButton();
-            }
+    // === DOM Cache ===
+    const $ = id => document.getElementById(id);
+    const playerInput = $('playerInput'),
+          addPlayerBtn = $('addPlayerBtn'),
+          playersList = $('playersList'),
+          playerCount = $('playerCount'),
+          oszustySelect = $('oszustySelect'),
+          categoryButtons = $('categoryButtons'),
+          totalWordsCount = $('totalWordsCount'),
+          startBtn = $('startBtn'),
+          allOszusciCheckbox = $('allOszusciCheckbox'),
+          roleDisplay = $('roleDisplay'),
+          playerButtons = $('playerButtons'),
+          endGameBtn = $('endGameBtn'),
+          votingDisplay = $('votingDisplay'),
+          currentVoterName = $('currentVoterName'),
+          votingInstruction = $('votingInstruction'),
+          votingButtons = $('votingButtons'),
+          selectedVotes = $('selectedVotes'),
+          submitVoteBtn = $('submitVoteBtn'),
+          skipVotingBtn = $('skipVotingBtn'),
+          votingResultsList = $('votingResultsList'),
+          continueBtn = $('continueBtn'),
+          newGameBtn = $('newGameBtn'),
+          continueBtnChaos = $('continueBtnChaos'),
+          newGameBtnChaos = $('newGameBtnChaos');
+
+    // === Helper Functions ===
+    // Updates "Liczba oszustów" depending on # of players
+    function updateOszustyOptions() {
+        const maxOszustow = Math.min(3, Math.max(1, gracze.length - 1));
+        oszustySelect.innerHTML = '';
+        for (let i = 1; i <= maxOszustow; i++) {
+            const opt = document.createElement('option');
+            opt.value = i; opt.textContent = i;
+            if(i === liczbaOszustow) opt.selected = true;
+            oszustySelect.appendChild(opt);
         }
+        liczbaOszustow = Math.min(liczbaOszustow, maxOszustow);
+    }
 
-        // Usuń gracza
-        function removePlayer(imie) {
+    // Update player count
+    function updatePlayerCount() {
+        if (playerCount) {
+            playerCount.textContent = `(${gracze.length})`;
+        }
+    }
+
+    // Player list rendering
+    function updatePlayersList() {
+        updatePlayerCount();
+        if (!gracze.length) {
+            playersList.innerHTML = '<div class="empty-state">Brak graczy - dodaj pierwszego!</div>';
+            return;
+        }
+        // For escaping player names in HTML attributes
+        function escapeAttr(s) { return String(s).replace(/'/g, '&#39;'); }
+        playersList.innerHTML = gracze.map(gracz =>
+            `<div class="player-item">
+                <span>${gracz}</span>
+                <button class="btn-remove" data-player="${escapeAttr(gracz)}">Usuń</button>
+            </div>`
+        ).join('');
+    }
+
+    // Start button enable/disable
+    function updateStartButton() {
+        startBtn.disabled = gracze.length < 3 || wybraneKategorie.size === 0;
+    }
+
+    function updateOszusty() {
+        liczbaOszustow = parseInt(oszustySelect.value,10) || 1;
+    }
+
+    // Update total words count from selected categories
+    function updateTotalWordsCount() {
+        if (totalWordsCount) {
+            let total = 0;
+            wybraneKategorie.forEach(kategoria => {
+                if (BAZA_PYTAN[kategoria]) {
+                    total += BAZA_PYTAN[kategoria].length;
+                }
+            });
+            totalWordsCount.textContent = total > 0 ? `(${total} haseł)` : '';
+        }
+    }
+
+    function updateCategoryButtons() {
+        const kategorie = Object.keys(BAZA_PYTAN);
+        categoryButtons.innerHTML = kategorie.map(kategoria =>
+            `<button class="category-btn${wybraneKategorie.has(kategoria)?'':' inactive'}" data-category="${kategoria}">
+                ${wybraneKategorie.has(kategoria)?'✓ ':''}${kategoria}
+            </button>`
+        ).join('');
+        updateTotalWordsCount();
+    }
+
+    // === Event Registration ===
+    // Add Player event
+    addPlayerBtn.onclick = function() {
+        const imie = playerInput.value.trim();
+        if (imie && !gracze.includes(imie)) {
+            gracze.push(imie);
+            playerInput.value = '';
+            updatePlayersList();
+            updateOszustyOptions();
+            updateStartButton();
+        }
+    };
+    playerInput.addEventListener('keypress', function(e) {
+        if(e.key==='Enter') addPlayerBtn.click();
+    });
+    playersList.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-remove');
+        if(btn) {
+            const imie = btn.getAttribute('data-player');
             gracze = gracze.filter(g => g !== imie);
             updatePlayersList();
             updateOszustyOptions();
             updateStartButton();
         }
-
-        // Aktualizuj listę graczy
-        function updatePlayersList() {
-            const list = document.getElementById('playersList');
-            
-            if (gracze.length === 0) {
-                list.innerHTML = '<div class="empty-state">Brak graczy - dodaj pierwszego!</div>';
+    });
+    oszustySelect.onchange = updateOszusty;
+    // Category toggle
+    categoryButtons.addEventListener('click', function(e){
+        const btn = e.target.closest('.category-btn');
+        if(!btn) return;
+        const kategoria = btn.getAttribute('data-category');
+        if(wybraneKategorie.has(kategoria)) {
+            wybraneKategorie.delete(kategoria);
+        } else {
+            wybraneKategorie.add(kategoria);
+        }
+        updateCategoryButtons();
+        updateStartButton();
+    });
+    allOszusciCheckbox.onchange = function() {
+        wszyscyOszusciEnabled = allOszusciCheckbox.checked;
+        const chaosText = $('chaosOptionText');
+        if (chaosText) {
+            if (wszyscyOszusciEnabled) {
+                chaosText.classList.add('chaos-active');
             } else {
-                list.innerHTML = gracze.map(gracz => `
-                    <div class="player-item">
-                        <span>${gracz}</span>
-                        <button class="btn-remove" onclick="removePlayer('${gracz}')">Usuń</button>
-                    </div>
-                `).join('');
+                chaosText.classList.remove('chaos-active');
             }
         }
+    };
 
-        // Aktualizuj opcje oszustów
-        function updateOszustyOptions() {
-            const select = document.getElementById('oszustySelect');
-            const maxOszustow = Math.min(3, Math.max(1, gracze.length - 1));
-            
-            select.innerHTML = '';
-            for (let i = 1; i <= maxOszustow; i++) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i;
-                if (i === liczbaOszustow && i <= maxOszustow) {
-                    option.selected = true;
-                }
-                select.appendChild(option);
+    // Start Game
+    startBtn.onclick = function() {
+        if(gracze.length < 3 || !wybraneKategorie.size) return;
+        let wszyscyOszusci = false;
+        if (wszyscyOszusciEnabled && Math.random() < 0.25) wszyscyOszusci = true;
+        czyChaos = wszyscyOszusci; // zapisz czy był chaos
+        const kategorieArr = [...wybraneKategorie],
+            kategoria = kategorieArr[Math.floor(Math.random()*kategorieArr.length)],
+            hasla = BAZA_PYTAN[kategoria],
+            haslo = hasla[Math.floor(Math.random()*hasla.length)];
+
+        let oszusci;
+        if (wszyscyOszusci) {
+            oszusci = gracze.slice();
+        } else {
+            const shuffled = gracze.slice();
+            for(let i=shuffled.length-1; i>0; i--){
+                const j = Math.floor(Math.random()*(i+1));
+                [shuffled[i],shuffled[j]] = [shuffled[j],shuffled[i]];
             }
-            
-            liczbaOszustow = Math.min(liczbaOszustow, maxOszustow);
+            oszusci = shuffled.slice(0,liczbaOszustow);
         }
-
-        // Zmień liczbę oszustów
-        function updateOszusty() {
-            liczbaOszustow = parseInt(document.getElementById('oszustySelect').value);
-        }
-
-        // Aktualizuj przycisk start
-        function updateStartButton() {
-            const btn = document.getElementById('startBtn');
-            btn.disabled = gracze.length < 3 || wybraneKategorie.size === 0;
-        }
-
-        // Enter aby dodać gracza
-        document.getElementById('playerInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                addPlayer();
+        graczeDane = {};
+        gracze.forEach(g=>{
+            graczeDane[g] = {
+                rola: oszusci.includes(g) ? 'OSZUST':'GRACZ',
+                haslo: oszusci.includes(g) ? null : haslo,
+                kategoria, jestOszustem: oszusci.includes(g)
             }
         });
+        // Render player buttons
+        playerButtons.innerHTML = gracze.map(gracz =>
+            `<button class="player-btn" data-player="${gracz}">${gracz}</button>`
+        ).join('');
+        aktualnieWidoczny = null;
+        roleDisplay.innerHTML = '<p>Wybierz swoje imię poniżej</p>';
+        endGameBtn.textContent = 'KONIEC GRY';
+        showScreen('gameScreen');
+    };
 
-        // Inicjalizuj przyciski kategorii
-        function initCategoryButtons() {
-            const container = document.getElementById('categoryButtons');
-            const kategorie = Object.keys(BAZA_PYTAN);
+    // Check if all buttons are removed and update end game button
+    function checkAllButtonsRemoved() {
+        const remainingButtons = playerButtons.querySelectorAll('.player-btn');
+        if (remainingButtons.length === 0) {
+            endGameBtn.textContent = 'ETAP GŁOSOWANIA';
+        } else {
+            endGameBtn.textContent = 'KONIEC GRY';
+        }
+    }
+
+    // Show/Hide role
+    playerButtons.addEventListener('click', function(e){
+        const btn = e.target.closest('.player-btn');
+        if(!btn) return;
+        const gracz = btn.getAttribute('data-player');
+        if(aktualnieWidoczny === gracz) {
+            roleDisplay.innerHTML = '<p>Wybierz swoje imię poniżej</p>';
+            aktualnieWidoczny = null;
+            btn.remove(); // remove clicked button after role hidden
+            checkAllButtonsRemoved();
+        } else {
+            const dane = graczeDane[gracz];
+            aktualnieWidoczny = gracz;
+            // Use template for minimal DOM construction
+            if(dane.jestOszustem) {
+                roleDisplay.innerHTML = `
+                    <h2>${gracz}</h2>
+                    <div class="oszust-badge">❌ OSZUST</div>
+                    <p><span class="category-tag">Kategoria: ${dane.kategoria}</span></p>
+                    <p style="margin-top:20px;color:rgba(255,255,255,.7);">Nie znasz hasła - musisz je odgadnąć!</p>
+                `;
+            } else {
+                roleDisplay.innerHTML = `
+                    <h2>${gracz}</h2>
+                    <div class="gracz-badge">✓ GRACZ</div>
+                    <div class="word-display">${dane.haslo}</div>
+                    <p><span class="category-tag">Kategoria: ${dane.kategoria}</span></p>
+                `;
+            }
+        }
+    });
+
+    // Start voting or end game
+    endGameBtn.onclick = function() {
+        const remainingButtons = playerButtons.querySelectorAll('.player-btn');
+        if (remainingButtons.length === 0) {
+            // Start voting
+            startVoting();
+        } else {
+            // End game without voting
+            showResults();
+        }
+    };
+
+    // Initialize voting
+    function startVoting() {
+        // Check if chaos mode (all players are oszustów)
+        if (czyChaos) {
+            showScreen('chaosScreen');
+            return;
+        }
+        glosy = {};
+        aktualnyGlosujacy = 0;
+        wybraneDoGlosowania = [];
+        showNextVoter();
+    }
+
+    // Show next voter
+    function showNextVoter() {
+        if (aktualnyGlosujacy >= gracze.length) {
+            // All votes collected, show results
+            showVotingResults();
+            return;
+        }
+
+        const gracz = gracze[aktualnyGlosujacy];
+        currentVoterName.textContent = gracz;
+        votingInstruction.textContent = `Wybierz ${liczbaOszustow} ${liczbaOszustow === 1 ? 'osobę' : 'osoby'}, którą uważasz za oszusta:`;
+        
+        // Create voting buttons (all players except current voter)
+        const pozostaliGracze = gracze.filter(g => g !== gracz);
+        votingButtons.innerHTML = pozostaliGracze.map(g =>
+            `<button class="player-btn vote-btn" data-vote="${g}">${g}</button>`
+        ).join('');
+
+        wybraneDoGlosowania = [];
+        selectedVotes.innerHTML = '';
+        updateSubmitButton();
+        showScreen('votingScreen');
+    }
+
+    // Handle vote button clicks
+    votingButtons.addEventListener('click', function(e) {
+        const btn = e.target.closest('.vote-btn');
+        if (!btn) return;
+        
+        const votedPlayer = btn.getAttribute('data-vote');
+        const index = wybraneDoGlosowania.indexOf(votedPlayer);
+        
+        if (index > -1) {
+            // Deselect
+            wybraneDoGlosowania.splice(index, 1);
+            btn.classList.remove('selected');
+        } else {
+            // Select (if not at max)
+            if (wybraneDoGlosowania.length < liczbaOszustow) {
+                wybraneDoGlosowania.push(votedPlayer);
+                btn.classList.add('selected');
+            }
+        }
+        
+        updateSelectedVotesDisplay();
+        updateSubmitButton();
+    });
+
+    // Update selected votes display
+    function updateSelectedVotesDisplay() {
+        if (wybraneDoGlosowania.length === 0) {
+            selectedVotes.innerHTML = '';
+            return;
+        }
+        selectedVotes.innerHTML = `
+            <div style="background:rgba(255,255,255,0.1);padding:15px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);">
+                <p style="margin-bottom:10px;font-weight:bold;">Wybrane osoby:</p>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                    ${wybraneDoGlosowania.map(g => 
+                        `<span class="category-tag" style="background:rgba(240,147,251,0.3);">${g}</span>`
+                    ).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    // Update submit button state
+    function updateSubmitButton() {
+        submitVoteBtn.disabled = wybraneDoGlosowania.length !== liczbaOszustow;
+    }
+
+    // Submit vote
+    submitVoteBtn.onclick = function() {
+        if (wybraneDoGlosowania.length !== liczbaOszustow) return;
+        
+        const gracz = gracze[aktualnyGlosujacy];
+        glosy[gracz] = wybraneDoGlosowania.slice();
+        aktualnyGlosujacy++;
+        showNextVoter();
+    };
+
+    // Skip voting
+    skipVotingBtn.onclick = function() {
+        showResults();
+    };
+
+    // Show voting results
+    function showVotingResults() {
+        // Count votes
+        const voteCounts = {};
+        gracze.forEach(g => voteCounts[g] = 0);
+        
+        Object.values(glosy).forEach(votes => {
+            votes.forEach(voted => {
+                voteCounts[voted] = (voteCounts[voted] || 0) + 1;
+            });
+        });
+
+        // Sort by votes
+        const sortedVotes = gracze.map(g => ({ 
+            name: g, 
+            votes: voteCounts[g],
+            jestOszustem: graczeDane[g] && graczeDane[g].jestOszustem
+        }))
+            .sort((a, b) => b.votes - a.votes);
+
+        // Check top players (top 1 for 1 oszust, top 1-2 for 2 oszustów, top 1-3 for 3 oszustów)
+        const topCount = liczbaOszustow;
+        const topPlayers = sortedVotes.slice(0, topCount);
+        const allTopWereOszusci = topPlayers.every(p => p.jestOszustem);
+
+        // Display voting results with role indicator and green highlight for correct top guesses
+        votingResultsList.innerHTML = sortedVotes.map((item, index) => {
+            const roleBadge = item.jestOszustem 
+                ? '<span style="color:#f5576c;font-weight:bold;">❌ OSZUST</span>' 
+                : '<span style="color:#667eea;font-weight:bold;">✓ GRACZ</span>';
             
-            container.innerHTML = kategorie.map(kategoria => `
-                <button class="category-btn" data-category="${kategoria}" onclick="toggleCategory('${kategoria}', this)">
-                    ✓ ${kategoria}
-                </button>
-            `).join('');
-        }
+            // Check if this is in top and was oszust
+            const isTop = index < topCount;
+            const isCorrect = isTop && item.jestOszustem;
+            const bgColor = isCorrect 
+                ? 'background:rgba(76,175,80,0.3);border-color:rgba(76,175,80,0.6);' 
+                : 'background:rgba(102,126,234,0.2);border-color:rgba(102,126,234,0.4);';
+            
+            return `<div class="result-item" style="${bgColor}">
+                ${item.name}: ${item.votes} ${item.votes === 1 ? 'głos' : 'głosów'} - ${roleBadge}
+            </div>`;
+        }).join('');
 
-        // Przełącz kategorię
-        function toggleCategory(kategoria, btn) {
-            if (wybraneKategorie.has(kategoria)) {
-                wybraneKategorie.delete(kategoria);
-                btn.classList.add('inactive');
-                btn.textContent = kategoria;
-            } else {
-                wybraneKategorie.add(kategoria);
-                btn.classList.remove('inactive');
-                btn.textContent = '✓ ' + kategoria;
-            }
-            updateStartButton();
-        }
+        showScreen('resultScreen');
+    }
 
-        // Przełącz tryb "wszyscy oszuści"
-        function toggleAllOszusci() {
-            wszyscyOszusciEnabled = document.getElementById('allOszusciCheckbox').checked;
-        }
-
-        // Inicjalizuj przy załadowaniu
-        initCategoryButtons();
-
-        // Rozpocznij grę
-        function startGame() {
-            if (gracze.length < 3 || wybraneKategorie.size === 0) return;
-
-            // Sprawdź czy włączony tryb "wszyscy oszuści" i losuj 25% szans
-            let wszyscyOszusci = false;
-            if (wszyscyOszusciEnabled && Math.random() < 0.25) {
-                wszyscyOszusci = true;
-            }
-
-            // Losuj kategorię tylko z wybranych
-            const dostepneKategorie = Array.from(wybraneKategorie);
-            const kategoria = dostepneKategorie[Math.floor(Math.random() * dostepneKategorie.length)];
-            const hasla = BAZA_PYTAN[kategoria];
-            const haslo = hasla[Math.floor(Math.random() * hasla.length)];
-
-            let oszusci;
-            if (wszyscyOszusci) {
-                // Wszyscy są oszustami
-                oszusci = [...gracze];
-            } else {
-                // Losuj oszustów normalnie
-                const shuffled = [...gracze].sort(() => Math.random() - 0.5);
-                oszusci = shuffled.slice(0, liczbaOszustow);
-            }
-
-            // Przypisz role
-            graczeDane = {};
-            gracze.forEach(gracz => {
-                if (oszusci.includes(gracz)) {
-                    graczeDane[gracz] = {
-                        rola: 'OSZUST',
-                        haslo: null,
-                        kategoria: kategoria,
-                        jestOszustem: true
-                    };
-                } else {
-                    graczeDane[gracz] = {
-                        rola: 'GRACZ',
-                        haslo: haslo,
-                        kategoria: kategoria,
-                        jestOszustem: false
-                    };
-                }
+    // Show results without voting or with partial voting
+    function showResults() {
+        // Check if there are any votes
+        const hasVotes = Object.keys(glosy).length > 0;
+        
+        if (hasVotes) {
+            // Count votes
+            const voteCounts = {};
+            gracze.forEach(g => voteCounts[g] = 0);
+            
+            Object.values(glosy).forEach(votes => {
+                votes.forEach(voted => {
+                    voteCounts[voted] = (voteCounts[voted] || 0) + 1;
+                });
             });
 
-            // Utwórz przyciski graczy
-            const buttonsDiv = document.getElementById('playerButtons');
-            buttonsDiv.innerHTML = gracze.map(gracz => `
-                <button class="player-btn" onclick="showRole('${gracz}', this)">${gracz}</button>
-            `).join('');
+            // Sort by votes
+            const sortedVotes = gracze.map(g => ({ 
+                name: g, 
+                votes: voteCounts[g],
+                jestOszustem: graczeDane[g] && graczeDane[g].jestOszustem
+            }))
+                .sort((a, b) => b.votes - a.votes);
 
-            aktualnieWidoczny = null;
-            document.getElementById('roleDisplay').innerHTML = '<p>Wybierz swoje imię poniżej</p>';
-            
-            showScreen('gameScreen');
-        }
+            // Check top players (top 1 for 1 oszust, top 1-2 for 2 oszustów, top 1-3 for 3 oszustów)
+            const topCount = liczbaOszustow;
+            const topPlayers = sortedVotes.slice(0, topCount);
+            const allTopWereOszusci = topPlayers.every(p => p.jestOszustem);
 
-        // Pokaż rolę gracza
-        function showRole(gracz, btn) {
-            const display = document.getElementById('roleDisplay');
-            
-            if (aktualnieWidoczny === gracz) {
-                // Ukryj i usuń przycisk
-                display.innerHTML = '<p>Wybierz swoje imię poniżej</p>';
-                aktualnieWidoczny = null;
-                btn.remove();
-            } else {
-                // Pokaż rolę
-                const dane = graczeDane[gracz];
-                aktualnieWidoczny = gracz;
+            // Display voting results with role indicator and green highlight for correct top guesses
+            votingResultsList.innerHTML = sortedVotes.map((item, index) => {
+                const roleBadge = item.jestOszustem 
+                    ? '<span style="color:#f5576c;font-weight:bold;">❌ OSZUST</span>' 
+                    : '<span style="color:#667eea;font-weight:bold;">✓ GRACZ</span>';
                 
-                if (dane.jestOszustem) {
-                    display.innerHTML = `
-                        <h2>${gracz}</h2>
-                        <div class="oszust-badge">❌ OSZUST</div>
-                        <p><span class="category-tag">Kategoria: ${dane.kategoria}</span></p>
-                        <p style="margin-top: 20px; color: rgba(255, 255, 255, 0.7);">Nie znasz hasła - musisz je odgadnąć!</p>
-                    `;
-                } else {
-                    display.innerHTML = `
-                        <h2>${gracz}</h2>
-                        <div class="gracz-badge">✓ GRACZ</div>
-                        <div class="word-display">${dane.haslo}</div>
-                        <p><span class="category-tag">Kategoria: ${dane.kategoria}</span></p>
-                    `;
-                }
-            }
+                // Check if this is in top and was oszust
+                const isTop = index < topCount;
+                const isCorrect = isTop && item.jestOszustem;
+                const bgColor = isCorrect 
+                    ? 'background:rgba(76,175,80,0.3);border-color:rgba(76,175,80,0.6);' 
+                    : 'background:rgba(102,126,234,0.2);border-color:rgba(102,126,234,0.4);';
+                
+                return `<div class="result-item" style="${bgColor}">
+                    ${item.name}: ${item.votes} ${item.votes === 1 ? 'głos' : 'głosów'} - ${roleBadge}
+                </div>`;
+            }).join('');
+        } else {
+            votingResultsList.innerHTML = '<div class="result-item" style="background:rgba(255,255,255,0.1);">Głosowanie pominięte</div>';
         }
 
-        // Zakończ grę
-        function endGame() {
-            const oszusci = Object.keys(graczeDane).filter(gracz => graczeDane[gracz].jestOszustem);
-            
-            const list = document.getElementById('oszusciList');
-            list.innerHTML = oszusci.map(oszust => `
-                <div class="result-item">❌ ${oszust}</div>
-            `).join('');
-            
-            showScreen('resultScreen');
-        }
+        showScreen('resultScreen');
+    }
 
-        // Kontynuuj grę (zachowuje graczy)
-        function continueGame() {
-            graczeDane = {};
-            aktualnieWidoczny = null;
-            
-            showScreen('menuScreen');
-        }
+    // Continue Game
+    continueBtn.onclick = function() {
+        graczeDane = {}; 
+        aktualnieWidoczny = null;
+        glosy = {};
+        aktualnyGlosujacy = 0;
+        wybraneDoGlosowania = [];
+        czyChaos = false;
+        endGameBtn.textContent = 'KONIEC GRY';
+        showScreen('menuScreen');
+    };
 
-        // Nowa gra (resetuje wszystko)
-        function newGame() {
-            gracze = [];
-            liczbaOszustow = 1;
-            graczeDane = {};
-            aktualnieWidoczny = null;
-            wybraneKategorie = new Set(Object.keys(BAZA_PYTAN));
-            wszyscyOszusciEnabled = false;
-            
-            document.getElementById('playerInput').value = '';
-            document.getElementById('allOszusciCheckbox').checked = false;
-            updatePlayersList();
-            updateOszustyOptions();
-            initCategoryButtons();
-            updateStartButton();
-            
-            showScreen('menuScreen');
-        }
+    // Continue Game from Chaos
+    continueBtnChaos.onclick = function() {
+        graczeDane = {}; 
+        aktualnieWidoczny = null;
+        glosy = {};
+        aktualnyGlosujacy = 0;
+        wybraneDoGlosowania = [];
+        czyChaos = false;
+        endGameBtn.textContent = 'KONIEC GRY';
+        showScreen('menuScreen');
+    };
 
-        // Pokaż ekran
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            document.getElementById(screenId).classList.add('active');
-        }
-    </script>
+    // New Game (reset all)
+    newGameBtn.onclick = function() {
+        gracze = [];
+        liczbaOszustow = 1;
+        graczeDane = {};
+        aktualnieWidoczny = null;
+        wybraneKategorie = new Set(Object.keys(BAZA_PYTAN));
+        wszyscyOszusciEnabled = false;
+        czyChaos = false;
+        glosy = {};
+        aktualnyGlosujacy = 0;
+        wybraneDoGlosowania = [];
+        playerInput.value = '';
+        allOszusciCheckbox.checked = false;
+        endGameBtn.textContent = 'KONIEC GRY';
+        updatePlayersList();
+        updateOszustyOptions();
+        updateCategoryButtons();
+        updateStartButton();
+        showScreen('menuScreen');
+    };
+
+    // New Game from Chaos (reset all)
+    newGameBtnChaos.onclick = function() {
+        gracze = [];
+        liczbaOszustow = 1;
+        graczeDane = {};
+        aktualnieWidoczny = null;
+        wybraneKategorie = new Set(Object.keys(BAZA_PYTAN));
+        wszyscyOszusciEnabled = false;
+        czyChaos = false;
+        glosy = {};
+        aktualnyGlosujacy = 0;
+        wybraneDoGlosowania = [];
+        playerInput.value = '';
+        allOszusciCheckbox.checked = false;
+        endGameBtn.textContent = 'KONIEC GRY';
+        updatePlayersList();
+        updateOszustyOptions();
+        updateCategoryButtons();
+        updateStartButton();
+        showScreen('menuScreen');
+    };
+
+    // === Show/Hide screens ===
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+        $(screenId).classList.add('active');
+    }
+
+    // === Initial Rendering ===
+    updateOszustyOptions();
+    updatePlayersList();
+    updateCategoryButtons();
+    updateStartButton();
+    // Check initial state of chaos checkbox
+    const chaosText = $('chaosOptionText');
+    if (chaosText && allOszusciCheckbox.checked) {
+        chaosText.classList.add('chaos-active');
+    }
+</script>
 </body>
 </html>
