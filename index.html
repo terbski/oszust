@@ -29,10 +29,29 @@
             to   { opacity:1; transform:translateY(0);}
         }
         h1 {
-            text-align:center; font-size:2.5em; margin-bottom:20px;
+            text-align:center; font-size:2em; margin-bottom:20px; white-space:nowrap;
             text-shadow:2px 2px 8px rgba(0,0,0,.5);
             background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);
             -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        }
+        @media (max-width: 500px) {
+            h1 { font-size:1.5em; }
+        }
+        .header-container {
+            position:relative; display:flex; justify-content:center; align-items:center;
+        }
+        .instruction-btn {
+            position:absolute; top:0; right:0;
+            width:40px; height:40px; border-radius:50%;
+            background:rgba(255,255,255,0.2); color:#fff;
+            border:2px solid rgba(255,255,255,0.3);
+            font-size:18px; font-weight:bold; cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            transition:all .3s;
+        }
+        .instruction-btn:hover {
+            background:rgba(255,255,255,0.3);
+            transform:scale(1.1);
         }
         h2 { text-align:center;font-size:1.5em; margin-bottom:15px; }
         .input-group { margin-bottom:15px; }
@@ -108,14 +127,18 @@
         .role-display p {font-size:1.2em;margin:8px 0;line-height:1.6;}
         .role-display strong{ color:#f093fb;}
         .oszust-badge {
-            background:linear-gradient(135deg,#f5576c 0%,#c92a3e 100%);
+            background:transparent;
             padding:8px 20px; border-radius:25px; display:inline-block; margin:10px 0;
-            font-size:1.3em; font-weight:bold; box-shadow:0 4px 15px rgba(245,87,108,0.4);
+            font-size:1.3em; font-weight:bold;
+            color:#f5576c;
+            border:2px solid rgba(255,255,255,0.2);
         }
         .gracz-badge {
-            background:linear-gradient(135deg,#4caf50 0%,#2e7d32 100%);
+            background:transparent;
             padding:8px 20px; border-radius:25px; display:inline-block; margin:10px 0;
-            font-size:1.3em; font-weight:bold; box-shadow:0 4px 15px rgba(76,175,80,0.4);
+            font-size:1.3em; font-weight:bold;
+            color:#4caf50;
+            border:2px solid rgba(255,255,255,0.2);
         }
         .category-tag {
             background:rgba(255,255,255,0.15); padding:6px 15px; border-radius:20px; display:inline-block; margin:5px 0;
@@ -156,34 +179,26 @@
             border:2px solid rgba(255,255,255,0.2);
             opacity:0.5;
         }
-        @keyframes chaosColor {
-            0% { color: #ff0000; }   /* czerwony */
-            16.66% { color: #ff7f00; } /* pomarańczowy */
-            33.33% { color: #ffff00; } /* żółty */
-            50% { color: #00ff00; }   /* zielony */
-            66.66% { color: #0000ff; } /* niebieski */
-            83.33% { color: #4b0082; } /* indygo */
-            100% { color: #9400d3; }  /* fioletowy */
-        }
         #chaosOptionText.chaos-active {
-            animation: chaosColor 2s ease-in-out infinite;
+            color: #ffd700;
             font-weight: bold;
         }
-        @keyframes jesterColor {
-            0% { color: #f093fb; }   /* różowy */
-            25% { color: #e91e63; }  /* różowy ciemniejszy */
-            50% { color: #9c27b0; }  /* fioletowy */
-            75% { color: #7b1fa2; }  /* fioletowy ciemniejszy */
-            100% { color: #f093fb; } /* różowy */
+        #allOszusciCheckbox:checked {
+            accent-color: #ffd700;
         }
         #jesterOptionText.jester-active {
-            animation: jesterColor 2s ease-in-out infinite;
+            color: #9c27b0;
             font-weight: bold;
         }
+        #jesterCheckbox:checked {
+            accent-color: #9c27b0;
+        }
         .jester-badge {
-            background:linear-gradient(135deg,#f093fb 0%,#e91e63 100%);
+            background:transparent;
             padding:8px 20px; border-radius:25px; display:inline-block; margin:10px 0;
-            font-size:1.3em; font-weight:bold; box-shadow:0 4px 15px rgba(240,147,251,0.4);
+            font-size:1.3em; font-weight:bold;
+            color:#9c27b0;
+            border:2px solid rgba(255,255,255,0.2);
         }
     </style>
 </head>
@@ -191,7 +206,10 @@
 <div class="container">
     <!-- Ekran Menu -->
     <div id="menuScreen" class="screen active">
-        <h1>🎭OSZUST - GRA SŁOWNA</h1>
+        <div class="header-container">
+            <h1>🎭OSZUST - GRA SŁOWNA</h1>
+            <button class="instruction-btn" id="instructionBtn" title="Instrukcja">?</button>
+        </div>
         <div class="input-group">
             <label>Dodaj graczy (minimum 3): <span id="playerCount" style="color:#f093fb;font-weight:bold;">(0)</span></label>
             <div class="input-with-btn">
@@ -212,7 +230,7 @@
         </div>
         <div class="input-group">
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
-                <input type="checkbox" id="allOszusciCheckbox" style="width:20px;height:20px;cursor:pointer;accent-color:#f5576c;">
+                <input type="checkbox" id="allOszusciCheckbox" style="width:20px;height:20px;cursor:pointer;accent-color:#ffd700;">
                 <span id="chaosOptionText">Opcja Chaosu</span>
             </label>
             <p style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:5px;font-style:italic;">
@@ -221,11 +239,11 @@
         </div>
         <div class="input-group">
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
-                <input type="checkbox" id="jesterCheckbox" style="width:20px;height:20px;cursor:pointer;accent-color:#f093fb;">
+                <input type="checkbox" id="jesterCheckbox" style="width:20px;height:20px;cursor:pointer;accent-color:#9c27b0;">
                 <span id="jesterOptionText">Opcja Jester</span>
             </label>
             <p style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:5px;font-style:italic;">
-                Jeśli włączone, maksymalnie 1 gracz otrzyma rolę Jester!
+                Jeśli włączone, jeden z graczy otrzyma rolę Jester!
             </p>
         </div>
         <button class="btn-primary" id="startBtn" disabled>START GRY</button>
@@ -271,12 +289,19 @@
     </div>
     <!-- Ekran Zwycięstwa Jestera -->
     <div id="jesterWinScreen" class="screen">
-        <h1 style="font-size:4em;margin:30px 0;color:#f093fb;">jester was wydymał</h1>
-        <div class="role-display" style="min-height:200px;">
-            <p style="font-size:1.5em;margin:20px 0;">Jester był w top wynikach głosowania!</p>
+        <div class="role-display" style="min-height:200px;border:3px solid #9c27b0;padding:30px;">
+            <h1 style="font-size:3em;margin:20px 0;color:#9c27b0;">jester was wydymał</h1>
+            <p style="font-size:1.5em;margin:20px 0;">Jester został wygłosowany!</p>
         </div>
         <button class="btn-primary" id="continueBtnJester" style="margin-bottom:10px;">KONTYNUUJ GRĘ</button>
         <button class="btn-primary" id="newGameBtnJester">NOWA GRA</button>
+    </div>
+    <!-- Ekran Instrukcji -->
+    <div id="instructionScreen" class="screen">
+        <h1>📖 INSTRUKCJA</h1>
+        <div class="role-display" style="text-align:left;padding:20px;max-height:500px;overflow-y:auto;">
+        </div>
+        <button class="btn-primary" id="backFromInstructionBtn">POWRÓT</button>
     </div>
 </div>
 
@@ -328,20 +353,33 @@
           continueBtnChaos = $('continueBtnChaos'),
           newGameBtnChaos = $('newGameBtnChaos'),
           continueBtnJester = $('continueBtnJester'),
-          newGameBtnJester = $('newGameBtnJester');
+          newGameBtnJester = $('newGameBtnJester'),
+          instructionBtn = $('instructionBtn'),
+          backFromInstructionBtn = $('backFromInstructionBtn');
 
     // === Helper Functions ===
     // Updates "Liczba oszustów" depending on # of players
     function updateOszustyOptions() {
-        const maxOszustow = Math.min(3, Math.max(1, gracze.length - 1));
+        let maxOszustow;
+        if (gracze.length >= 1 && gracze.length <= 4) {
+            maxOszustow = 1;
+        } else if (gracze.length >= 5 && gracze.length <= 7) {
+            maxOszustow = 2;
+        } else if (gracze.length >= 8) {
+            maxOszustow = 3;
+        } else {
+            maxOszustow = 1;
+        }
         oszustySelect.innerHTML = '';
         for (let i = 1; i <= maxOszustow; i++) {
             const opt = document.createElement('option');
             opt.value = i; opt.textContent = i;
-            if(i === liczbaOszustow) opt.selected = true;
+            if(i === liczbaOszustow || (liczbaOszustow > maxOszustow && i === 1)) opt.selected = true;
             oszustySelect.appendChild(opt);
         }
-        liczbaOszustow = Math.min(liczbaOszustow, maxOszustow);
+        if (liczbaOszustow > maxOszustow) {
+            liczbaOszustow = 1;
+        }
     }
 
     // Update player count
@@ -477,7 +515,13 @@
         let jester = null; // maksymalnie 1 gracz z rolą Jester
         
         if (wszyscyOszusci) {
+            // W chaosie wszyscy są oszustami
             oszusci = gracze.slice();
+            // W chaosie może być jester (jeśli opcja włączona)
+            if (jesterEnabled && gracze.length > 0) {
+                // Losuj jednego gracza jako jestera
+                jester = gracze[Math.floor(Math.random() * gracze.length)];
+            }
         } else {
             // Fisher-Yates shuffle
             const shuffled = [...gracze];
@@ -486,14 +530,14 @@
                 [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
             }
             oszusci = shuffled.slice(0, liczbaOszustow);
-        }
-        
-        // Losowanie Jester (jeśli opcja włączona i nie ma chaosu, 100% szansy na maksymalnie 1 gracza)
-        if (jesterEnabled && !wszyscyOszusci && gracze.length > 0) {
-            const pozostaliGracze = gracze.filter(g => !oszusci.includes(g));
-            if (pozostaliGracze.length > 0) {
-                // Losuj jednego gracza z pozostałych (nie-oszustów)
-                jester = pozostaliGracze[Math.floor(Math.random() * pozostaliGracze.length)];
+            
+            // Losowanie Jester (jeśli opcja włączona i nie ma chaosu, 100% szansy na maksymalnie 1 gracza)
+            if (jesterEnabled && gracze.length > 0) {
+                const pozostaliGracze = gracze.filter(g => !oszusci.includes(g));
+                if (pozostaliGracze.length > 0) {
+                    // Losuj jednego gracza z pozostałych (nie-oszustów)
+                    jester = pozostaliGracze[Math.floor(Math.random() * pozostaliGracze.length)];
+                }
             }
         }
         
@@ -502,9 +546,9 @@
             if (g === jester) {
                 graczeDane[g] = {
                     rola: 'JESTER',
-                    haslo: null,
+                    haslo: haslo,
                     kategoria,
-                    jestOszustem: false,
+                    jestOszustem: wszyscyOszusci, // w chaosie jester też jest oszustem
                     jestJester: true
                 };
             } else {
@@ -555,8 +599,9 @@
                 roleDisplay.innerHTML = `
                     <h2>${gracz}</h2>
                     <div class="jester-badge">JESTER</div>
+                    <div class="word-display">${dane.haslo}</div>
                     <p><span class="category-tag">Kategoria: ${dane.kategoria}</span></p>
-                    <p style="margin-top:20px;color:rgba(255,255,255,.7);">Nie znasz hasła - musisz je odgadnąć!</p>
+                    <p style="margin-top:20px;color:rgba(255,255,255,.7);">Twoim zadaniem jest zostać wygłosowanym!</p>
                 `;
             } else if(dane.jestOszustem) {
                 roleDisplay.innerHTML = `
@@ -590,11 +635,6 @@
 
     // Initialize voting
     function startVoting() {
-        // Check if chaos mode (all players are oszustów)
-        if (czyChaos) {
-            showScreen('chaosScreen');
-            return;
-        }
         glosy = {};
         aktualnyGlosujacy = 0;
         wybraneDoGlosowania = [];
@@ -709,10 +749,20 @@
         })).sort((a, b) => b.votes - a.votes);
 
         const topCount = liczbaOszustow;
-        return sortedVotes.map((item, index) => {
+        let html = '';
+        
+        // Dodaj informację o chaosie jeśli był
+        if (czyChaos) {
+            html += `<div class="result-item" style="background:rgba(255,215,0,0.3);border-color:rgba(255,215,0,0.6);margin-bottom:15px;">
+                <strong style="color:#ffd700;font-size:1.2em;">CHAOS!</strong><br>
+                Wszyscy gracze byli oszustami!
+            </div>`;
+        }
+        
+        html += sortedVotes.map((item, index) => {
             let roleBadge;
             if (item.jestJester) {
-                roleBadge = '<span style="color:#f093fb;font-weight:bold;">JESTER</span>';
+                roleBadge = '<span style="color:#9c27b0;font-weight:bold;">JESTER</span>';
             } else if (item.jestOszustem) {
                 roleBadge = '<span style="color:#f5576c;font-weight:bold;">OSZUST</span>';
             } else {
@@ -728,6 +778,8 @@
                 ${item.name}: ${item.votes} ${item.votes === 1 ? 'głos' : 'głosów'} - ${roleBadge}
             </div>`;
         }).join('');
+        
+        return html;
     }
 
     // Show voting results
@@ -865,6 +917,16 @@
         document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
         $(screenId).classList.add('active');
     }
+
+    // Instruction button handler
+    instructionBtn.onclick = function() {
+        showScreen('instructionScreen');
+    };
+
+    // Back from instruction button handler
+    backFromInstructionBtn.onclick = function() {
+        showScreen('menuScreen');
+    };
 
     // === Initial Rendering ===
     updateOszustyOptions();
