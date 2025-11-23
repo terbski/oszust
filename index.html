@@ -200,6 +200,36 @@
             color:#9c27b0;
             border:2px solid rgba(255,255,255,0.2);
         }
+        .instruction-content h2 {
+            text-align:left; font-size:1.5em; margin:20px 0 15px 0; color:#f093fb;
+        }
+        .instruction-content h3 {
+            text-align:left; font-size:1.2em; margin:15px 0 10px 0; color:#fff;
+        }
+        .instruction-content ul {
+            margin:10px 0 10px 20px; line-height:1.8;
+        }
+        .instruction-content li {
+            margin:8px 0;
+        }
+        .instruction-content .role-gracz {
+            color:#4caf50; font-weight:bold;
+        }
+        .instruction-content .role-oszust {
+            color:#f5576c; font-weight:bold;
+        }
+        .instruction-content .role-jester {
+            color:#9c27b0; font-weight:bold;
+        }
+        .instruction-content .chaos-text {
+            color:#ffd700; font-weight:bold;
+        }
+        .instruction-content p {
+            margin:10px 0; line-height:1.6;
+        }
+        .player-btn.disabled {
+            opacity:0.3; cursor:not-allowed; pointer-events:none;
+        }
     </style>
 </head>
 <body>
@@ -299,7 +329,38 @@
     <!-- Ekran Instrukcji -->
     <div id="instructionScreen" class="screen">
         <h1>📖 INSTRUKCJA</h1>
-        <div class="role-display" style="text-align:left;padding:20px;max-height:500px;overflow-y:auto;">
+        <div class="role-display instruction-content" style="text-align:left;padding:20px;max-height:500px;overflow-y:auto;">
+            <h2>Role</h2>
+            <ul>
+                <li><span class="role-gracz">Gracz</span> – zna hasło, podaje skojarzenia</li>
+                <li><span class="role-oszust">Oszust</span> – nie zna hasła, musi je zgadnąć lub ukryć się do końca</li>
+                <li><span class="role-jester">Jester</span> – zna hasło, celowo chce zostać wygłosowany</li>
+            </ul>
+
+            <h2>Przebieg gry</h2>
+            <h3>Etap 1: Losowanie</h3>
+            <p>Każdy gracz dowiaduje się, jaką ma rolę. Gracze i Jester poznają hasło. Oszust nie zna hasła.</p>
+            <p><span class="chaos-text">Opcja CHAOS</span> – nikt nie zna hasła! Gracze wymyślają skojarzenia na czuja, zwiększając zabawę i dezorientację. Jester nadal może wygrać, jeśli zostanie wygłosowany.</p>
+
+            <h3>Etap 2: Skojarzenia</h3>
+            <p>Gracze po kolei podają swoje skojarzenia z hasłem przez ustaloną liczbę tur. <strong>Zasady:</strong></p>
+            <ul>
+                <li>Nie można użyć samego hasła ani słów w nim zawartych</li>
+                <li>Oszust w dowolnym momencie może się przyznać i zgadywać hasło:
+                    <ul>
+                        <li>Jeśli trafi → <strong>Oszust wygrywa</strong></li>
+                        <li>Jeśli nie trafi → odpada z gry</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Etap 3: Głosowanie</h3>
+            <p>Gracze głosują na najbardziej podejrzaną osobę:</p>
+            <ul>
+                <li>Wygłosowano Oszusta → <strong>Gracze wygrywają</strong></li>
+                <li>Wygłosowano Jestera → <strong>Jester wygrywa</strong></li>
+                <li>Wygłosowano zwykłego Gracza → <strong>Oszust wygrywa</strong></li>
+            </ul>
         </div>
         <button class="btn-primary" id="backFromInstructionBtn">POWRÓT</button>
     </div>
@@ -358,93 +419,86 @@
           backFromInstructionBtn = $('backFromInstructionBtn');
 
     // === Helper Functions ===
-    // Updates "Liczba oszustów" depending on # of players
-    function updateOszustyOptions() {
-        let maxOszustow;
-        if (gracze.length >= 1 && gracze.length <= 4) {
-            maxOszustow = 1;
-        } else if (gracze.length >= 5 && gracze.length <= 7) {
-            maxOszustow = 2;
-        } else if (gracze.length >= 8) {
-            maxOszustow = 3;
-        } else {
-            maxOszustow = 1;
+    // Fisher-Yates shuffle
+    const shuffleArray = arr => {
+        const shuffled = [...arr];
+        for(let i = shuffled.length - 1; i > 0; i--){
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
+        return shuffled;
+    };
+
+    // Get random element from array
+    const randomElement = arr => arr[Math.floor(Math.random() * arr.length)];
+
+    // Updates "Liczba oszustów" depending on # of players
+    const updateOszustyOptions = () => {
+        const maxOszustow = gracze.length <= 4 ? 1 : gracze.length <= 7 ? 2 : 3;
+        if (liczbaOszustow > maxOszustow) liczbaOszustow = 1;
+        
         oszustySelect.innerHTML = '';
         for (let i = 1; i <= maxOszustow; i++) {
             const opt = document.createElement('option');
-            opt.value = i; opt.textContent = i;
-            if(i === liczbaOszustow || (liczbaOszustow > maxOszustow && i === 1)) opt.selected = true;
+            opt.value = i;
+            opt.textContent = i;
+            if (i === liczbaOszustow || (liczbaOszustow > maxOszustow && i === 1)) {
+                opt.selected = true;
+            }
             oszustySelect.appendChild(opt);
         }
-        if (liczbaOszustow > maxOszustow) {
-            liczbaOszustow = 1;
-        }
-    }
+    };
 
     // Update player count
-    function updatePlayerCount() {
-        if (playerCount) {
-            playerCount.textContent = `(${gracze.length})`;
-        }
-    }
+    const updatePlayerCount = () => {
+        if (playerCount) playerCount.textContent = `(${gracze.length})`;
+    };
 
     // Player list rendering
-    function updatePlayersList() {
+    const updatePlayersList = () => {
         updatePlayerCount();
         if (!gracze.length) {
             playersList.innerHTML = '<div class="empty-state">Brak graczy - dodaj pierwszego!</div>';
             return;
         }
-        // For escaping player names in HTML attributes
-        function escapeAttr(s) { return String(s).replace(/'/g, '&#39;'); }
+        const escapeAttr = s => String(s).replace(/'/g, '&#39;');
         playersList.innerHTML = gracze.map(gracz =>
             `<div class="player-item">
                 <span>${gracz}</span>
                 <button class="btn-remove" data-player="${escapeAttr(gracz)}">Usuń</button>
             </div>`
         ).join('');
-    }
+    };
 
     // Start button enable/disable
-    function updateStartButton() {
+    const updateStartButton = () => {
         startBtn.disabled = gracze.length < 3 || wybraneKategorie.size === 0;
-    }
+    };
 
-    function updateOszusty() {
-        liczbaOszustow = parseInt(oszustySelect.value,10) || 1;
-    }
+    const updateOszusty = () => {
+        liczbaOszustow = parseInt(oszustySelect.value, 10) || 1;
+    };
 
     // Update total words count from selected categories
-    function updateTotalWordsCount() {
-        if (totalWordsCount) {
-            let total = 0;
-            wybraneKategorie.forEach(kategoria => {
-                if (BAZA_PYTAN[kategoria]) {
-                    total += BAZA_PYTAN[kategoria].length;
-                }
-            });
-            if (total === 0) {
-                totalWordsCount.textContent = '(brak haseł)';
-            } else if (total === 1) {
-                totalWordsCount.textContent = `(${total} hasło)`;
-            } else if (total < 5) {
-                totalWordsCount.textContent = `(${total} hasła)`;
-            } else {
-                totalWordsCount.textContent = `(${total} haseł)`;
-            }
-        }
-    }
+    const updateTotalWordsCount = () => {
+        if (!totalWordsCount) return;
+        const total = [...wybraneKategorie].reduce((sum, k) => sum + (BAZA_PYTAN[k]?.length || 0), 0);
+        const text = total === 0 ? '(brak haseł)' : 
+                     total === 1 ? `(${total} hasło)` : 
+                     total < 5 ? `(${total} hasła)` : 
+                     `(${total} haseł)`;
+        totalWordsCount.textContent = text;
+    };
 
-    function updateCategoryButtons() {
-        const kategorie = Object.keys(BAZA_PYTAN);
-        categoryButtons.innerHTML = kategorie.map(kategoria =>
-            `<button class="category-btn${wybraneKategorie.has(kategoria)?'':' inactive'}" data-category="${kategoria}">
-                ${wybraneKategorie.has(kategoria)?'✓ ':''}${kategoria}
-            </button>`
-        ).join('');
+    const updateCategoryButtons = () => {
+        categoryButtons.innerHTML = Object.keys(BAZA_PYTAN).map(kategoria => {
+            const isSelected = wybraneKategorie.has(kategoria);
+            return `<button class="category-btn${isSelected ? '' : ' inactive'}" data-category="${kategoria}">
+                ${isSelected ? '✓ ' : ''}${kategoria}
+            </button>`;
+        }).join('');
         updateTotalWordsCount();
-    }
+    };
 
     // === Event Registration ===
     // Add Player event
@@ -485,19 +539,13 @@
         updateCategoryButtons();
         updateStartButton();
     });
-    allOszusciCheckbox.onchange = function() {
+    allOszusciCheckbox.onchange = () => {
         wszyscyOszusciEnabled = allOszusciCheckbox.checked;
-        const chaosText = $('chaosOptionText');
-        if (chaosText) {
-            chaosText.classList.toggle('chaos-active', wszyscyOszusciEnabled);
-        }
+        $('chaosOptionText')?.classList.toggle('chaos-active', wszyscyOszusciEnabled);
     };
-    jesterCheckbox.onchange = function() {
+    jesterCheckbox.onchange = () => {
         jesterEnabled = jesterCheckbox.checked;
-        const jesterText = $('jesterOptionText');
-        if (jesterText) {
-            jesterText.classList.toggle('jester-active', jesterEnabled);
-        }
+        $('jesterOptionText')?.classList.toggle('jester-active', jesterEnabled);
     };
 
     // Start Game
@@ -505,11 +553,9 @@
         if(gracze.length < 3 || !wybraneKategorie.size) return;
         let wszyscyOszusci = false;
         if (wszyscyOszusciEnabled && Math.random() < 0.25) wszyscyOszusci = true;
-        czyChaos = wszyscyOszusci; // zapisz czy był chaos
-        const kategorieArr = [...wybraneKategorie],
-            kategoria = kategorieArr[Math.floor(Math.random()*kategorieArr.length)],
-            hasla = BAZA_PYTAN[kategoria],
-            haslo = hasla[Math.floor(Math.random()*hasla.length)];
+        czyChaos = wszyscyOszusci;
+        const kategoria = randomElement([...wybraneKategorie]);
+        const haslo = randomElement(BAZA_PYTAN[kategoria]);
 
         let oszusci;
         let jester = null; // maksymalnie 1 gracz z rolą Jester
@@ -517,26 +563,16 @@
         if (wszyscyOszusci) {
             // W chaosie wszyscy są oszustami
             oszusci = gracze.slice();
-            // W chaosie może być jester (jeśli opcja włączona)
             if (jesterEnabled && gracze.length > 0) {
-                // Losuj jednego gracza jako jestera
-                jester = gracze[Math.floor(Math.random() * gracze.length)];
+                jester = randomElement(gracze);
             }
         } else {
-            // Fisher-Yates shuffle
-            const shuffled = [...gracze];
-            for(let i = shuffled.length - 1; i > 0; i--){
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-            oszusci = shuffled.slice(0, liczbaOszustow);
+            oszusci = shuffleArray(gracze).slice(0, liczbaOszustow);
             
-            // Losowanie Jester (jeśli opcja włączona i nie ma chaosu, 100% szansy na maksymalnie 1 gracza)
-            if (jesterEnabled && gracze.length > 0) {
+            if (jesterEnabled) {
                 const pozostaliGracze = gracze.filter(g => !oszusci.includes(g));
                 if (pozostaliGracze.length > 0) {
-                    // Losuj jednego gracza z pozostałych (nie-oszustów)
-                    jester = pozostaliGracze[Math.floor(Math.random() * pozostaliGracze.length)];
+                    jester = randomElement(pozostaliGracze);
                 }
             }
         }
@@ -568,29 +604,36 @@
         aktualnieWidoczny = null;
         roleDisplay.innerHTML = '<p>Wybierz swoje imię poniżej</p>';
         endGameBtn.textContent = 'KONIEC GRY';
+        updatePlayerButtonsState();
         showScreen('gameScreen');
     };
 
     // Check if all buttons are removed and update end game button
-    function checkAllButtonsRemoved() {
-        const remainingButtons = playerButtons.querySelectorAll('.player-btn');
-        if (remainingButtons.length === 0) {
-            endGameBtn.textContent = 'ETAP GŁOSOWANIA';
-        } else {
-            endGameBtn.textContent = 'KONIEC GRY';
-        }
-    }
+    const checkAllButtonsRemoved = () => {
+        endGameBtn.textContent = playerButtons.querySelectorAll('.player-btn').length === 0 
+            ? 'ETAP GŁOSOWANIA' 
+            : 'KONIEC GRY';
+    };
+
+    // Update button states based on visible role
+    const updatePlayerButtonsState = () => {
+        playerButtons.querySelectorAll('.player-btn').forEach(btn => {
+            const btnGracz = btn.getAttribute('data-player');
+            btn.classList.toggle('disabled', aktualnieWidoczny && aktualnieWidoczny !== btnGracz);
+        });
+    };
 
     // Show/Hide role
     playerButtons.addEventListener('click', function(e){
         const btn = e.target.closest('.player-btn');
-        if(!btn) return;
+        if(!btn || btn.classList.contains('disabled')) return;
         const gracz = btn.getAttribute('data-player');
         if(aktualnieWidoczny === gracz) {
             roleDisplay.innerHTML = '<p>Wybierz swoje imię poniżej</p>';
             aktualnieWidoczny = null;
             btn.remove(); // remove clicked button after role hidden
             checkAllButtonsRemoved();
+            updatePlayerButtonsState();
         } else {
             const dane = graczeDane[gracz];
             aktualnieWidoczny = gracz;
@@ -618,6 +661,7 @@
                     <p><span class="category-tag">Kategoria: ${dane.kategoria}</span></p>
                 `;
             }
+            updatePlayerButtonsState();
         }
     });
 
@@ -634,15 +678,15 @@
     };
 
     // Initialize voting
-    function startVoting() {
+    const startVoting = () => {
         glosy = {};
         aktualnyGlosujacy = 0;
         wybraneDoGlosowania = [];
         showNextVoter();
-    }
+    };
 
     // Show next voter
-    function showNextVoter() {
+    const showNextVoter = () => {
         if (aktualnyGlosujacy >= gracze.length) {
             // All votes collected, show results
             showVotingResults();
@@ -690,7 +734,7 @@
     });
 
     // Update selected votes display
-    function updateSelectedVotesDisplay() {
+    const updateSelectedVotesDisplay = () => {
         if (wybraneDoGlosowania.length === 0) {
             selectedVotes.innerHTML = '';
             return;
@@ -705,12 +749,12 @@
                 </div>
             </div>
         `;
-    }
+    };
 
     // Update submit button state
-    function updateSubmitButton() {
+    const updateSubmitButton = () => {
         submitVoteBtn.disabled = wybraneDoGlosowania.length !== liczbaOszustow;
-    }
+    };
 
     // Submit vote
     submitVoteBtn.onclick = function() {
@@ -728,19 +772,29 @@
     };
 
     // Count votes (shared function)
-    function countVotes() {
+    const countVotes = () => {
         const voteCounts = {};
         gracze.forEach(g => voteCounts[g] = 0);
         Object.values(glosy).forEach(votes => {
-            votes.forEach(voted => {
-                voteCounts[voted] = (voteCounts[voted] || 0) + 1;
-            });
+            votes.forEach(voted => voteCounts[voted]++);
         });
         return voteCounts;
-    }
+    };
+
+    // Check if Jester won
+    const checkJesterWin = (voteCounts) => {
+        const sortedVotes = gracze.map(g => ({ 
+            name: g, 
+            votes: voteCounts[g] || 0,
+            jestJester: graczeDane[g]?.jestJester
+        })).sort((a, b) => b.votes - a.votes);
+        
+        const topPlayers = sortedVotes.slice(0, liczbaOszustow);
+        return topPlayers.some(p => p.jestJester);
+    };
 
     // Render voting results (shared function)
-    function renderVotingResults(voteCounts) {
+    const renderVotingResults = (voteCounts) => {
         const sortedVotes = gracze.map(g => ({ 
             name: g, 
             votes: voteCounts[g] || 0,
@@ -780,65 +834,37 @@
         }).join('');
         
         return html;
-    }
+    };
 
     // Show voting results
-    function showVotingResults() {
+    const showVotingResults = () => {
         const voteCounts = countVotes();
-        const sortedVotes = gracze.map(g => ({ 
-            name: g, 
-            votes: voteCounts[g] || 0,
-            jestJester: graczeDane[g]?.jestJester
-        })).sort((a, b) => b.votes - a.votes);
-
-        const topCount = liczbaOszustow;
-        const topPlayers = sortedVotes.slice(0, topCount);
-        
-        // Check if Jester was in top results
-        const jesterInTop = topPlayers.some(p => p.jestJester);
-        
-        if (jesterInTop) {
-            // Jester won - show jester win screen
+        if (checkJesterWin(voteCounts)) {
             showScreen('jesterWinScreen');
             return;
         }
-        
         votingResultsList.innerHTML = renderVotingResults(voteCounts);
         showScreen('resultScreen');
-    }
+    };
 
     // Show results without voting or with partial voting
-    function showResults() {
+    const showResults = () => {
         const hasVotes = Object.keys(glosy).length > 0;
         if (hasVotes) {
             const voteCounts = countVotes();
-            const sortedVotes = gracze.map(g => ({ 
-                name: g, 
-                votes: voteCounts[g] || 0,
-                jestJester: graczeDane[g]?.jestJester
-            })).sort((a, b) => b.votes - a.votes);
-
-            const topCount = liczbaOszustow;
-            const topPlayers = sortedVotes.slice(0, topCount);
-            
-            // Check if Jester was in top results
-            const jesterInTop = topPlayers.some(p => p.jestJester);
-            
-            if (jesterInTop) {
-                // Jester won - show jester win screen
+            if (checkJesterWin(voteCounts)) {
                 showScreen('jesterWinScreen');
                 return;
             }
-            
             votingResultsList.innerHTML = renderVotingResults(voteCounts);
         } else {
             votingResultsList.innerHTML = '<div class="result-item" style="background:rgba(255,255,255,0.1);">Głosowanie pominięte</div>';
         }
         showScreen('resultScreen');
-    }
+    };
 
     // Reset game state (shared function)
-    function resetGameState() {
+    const resetGameState = () => {
         graczeDane = {}; 
         aktualnieWidoczny = null;
         glosy = {};
@@ -846,28 +872,19 @@
         wybraneDoGlosowania = [];
         czyChaos = false;
         endGameBtn.textContent = 'KONIEC GRY';
-    }
+    };
 
-    // Continue Game
-    continueBtn.onclick = function() {
+    // Continue Game (shared handler)
+    const continueGame = () => {
         resetGameState();
         showScreen('menuScreen');
     };
-
-    // Continue Game from Chaos
-    continueBtnChaos.onclick = function() {
-        resetGameState();
-        showScreen('menuScreen');
-    };
-
-    // Continue Game from Jester Win
-    continueBtnJester.onclick = function() {
-        resetGameState();
-        showScreen('menuScreen');
-    };
+    continueBtn.onclick = continueGame;
+    continueBtnChaos.onclick = continueGame;
+    continueBtnJester.onclick = continueGame;
 
     // Reset all game data (shared function)
-    function resetAllGameData() {
+    const resetAllGameData = () => {
         gracze = [];
         liczbaOszustow = 1;
         graczeDane = {};
@@ -887,36 +904,24 @@
         updateOszustyOptions();
         updateCategoryButtons();
         updateStartButton();
-        // Reset chaos and jester animations
-        const chaosText = $('chaosOptionText');
-        const jesterText = $('jesterOptionText');
-        if (chaosText) chaosText.classList.remove('chaos-active');
-        if (jesterText) jesterText.classList.remove('jester-active');
-    }
+        $('chaosOptionText')?.classList.remove('chaos-active');
+        $('jesterOptionText')?.classList.remove('jester-active');
+    };
 
-    // New Game (reset all)
-    newGameBtn.onclick = function() {
+    // New Game (shared handler)
+    const newGame = () => {
         resetAllGameData();
         showScreen('menuScreen');
     };
-
-    // New Game from Chaos (reset all)
-    newGameBtnChaos.onclick = function() {
-        resetAllGameData();
-        showScreen('menuScreen');
-    };
-
-    // New Game from Jester Win (reset all)
-    newGameBtnJester.onclick = function() {
-        resetAllGameData();
-        showScreen('menuScreen');
-    };
+    newGameBtn.onclick = newGame;
+    newGameBtnChaos.onclick = newGame;
+    newGameBtnJester.onclick = newGame;
 
     // === Show/Hide screens ===
-    function showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-        $(screenId).classList.add('active');
-    }
+    const showScreen = screenId => {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        $(screenId)?.classList.add('active');
+    };
 
     // Instruction button handler
     instructionBtn.onclick = function() {
