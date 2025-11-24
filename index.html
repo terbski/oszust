@@ -165,10 +165,11 @@
             background-repeat:no-repeat; background-position:right 12px center; background-size:20px; padding-right:40px;
         }
         .category-btn {
-            padding:12px; font-size:14px;
+            padding:10px 8px; font-size:13px;
             background:linear-gradient(135deg,rgba(102,126,234,0.4) 0%,rgba(118,75,162,0.4) 100%);
             color:#fff; border-radius:10px; border:2px solid rgba(102,126,234,.6);
             transition:all .3s; cursor:pointer;
+            word-wrap:break-word;
         }
         .category-btn:hover {
             transform:translateY(-2px);
@@ -227,6 +228,28 @@
         .instruction-content p {
             margin:10px 0; line-height:1.6;
         }
+        .instruction-content {
+            overflow-y:auto;
+            overflow-x:hidden;
+            display:block !important;
+            justify-content:flex-start !important;
+            align-items:flex-start !important;
+            max-height:calc(100vh - 200px);
+        }
+        .instruction-content::-webkit-scrollbar {
+            width:10px;
+        }
+        .instruction-content::-webkit-scrollbar-track {
+            background:rgba(255,255,255,0.05);
+            border-radius:10px;
+        }
+        .instruction-content::-webkit-scrollbar-thumb {
+            background:rgba(255,255,255,0.3);
+            border-radius:10px;
+        }
+        .instruction-content::-webkit-scrollbar-thumb:hover {
+            background:rgba(255,255,255,0.4);
+        }
         .player-btn.disabled {
             opacity:0.3; cursor:not-allowed; pointer-events:none;
         }
@@ -256,25 +279,19 @@
         </div>
         <div class="input-group">
             <label>Wybierz kategorie: <span id="totalWordsCount" style="color:#f093fb;font-weight:bold;"></span></label>
-            <div id="categoryButtons" style="display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-top:10px;"></div>
+            <div id="categoryButtons" style="display: grid; grid-template-columns: repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-top:10px;"></div>
         </div>
         <div class="input-group">
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
                 <input type="checkbox" id="allOszusciCheckbox" style="width:20px;height:20px;cursor:pointer;accent-color:#ffd700;">
                 <span id="chaosOptionText">Opcja Chaosu</span>
             </label>
-            <p style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:5px;font-style:italic;">
-                Jeśli włączone, jest 25% szans że wszyscy gracze będą oszustami!
-            </p>
         </div>
         <div class="input-group">
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
                 <input type="checkbox" id="jesterCheckbox" style="width:20px;height:20px;cursor:pointer;accent-color:#9c27b0;">
                 <span id="jesterOptionText">Opcja Jester</span>
             </label>
-            <p style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:5px;font-style:italic;">
-                Jeśli włączone, jeden z graczy otrzyma rolę Jester!
-            </p>
         </div>
         <button class="btn-primary" id="startBtn" disabled>START GRY</button>
     </div>
@@ -329,38 +346,29 @@
     <!-- Ekran Instrukcji -->
     <div id="instructionScreen" class="screen">
         <h1>📖 INSTRUKCJA</h1>
-        <div class="role-display instruction-content" style="text-align:left;padding:20px;max-height:500px;overflow-y:auto;">
+        <div class="role-display instruction-content" style="text-align:left;padding:20px;">
             <h2>Role</h2>
             <ul>
                 <li><span class="role-gracz">Gracz</span> – zna hasło, podaje skojarzenia</li>
-                <li><span class="role-oszust">Oszust</span> – nie zna hasła, musi je zgadnąć lub ukryć się do końca</li>
-                <li><span class="role-jester">Jester</span> – zna hasło, celowo chce zostać wygłosowany</li>
+                <li><span class="role-oszust">Oszust</span> – nie zna hasła, musi je zgadnąć lub ukryć się</li>
+                <li><span class="role-jester">Jester</span> – zna hasło, chce zostać wygłosowany</li>
             </ul>
 
-            <h2>Przebieg gry</h2>
-            <h3>Etap 1: Losowanie</h3>
-            <p>Każdy gracz dowiaduje się, jaką ma rolę. Gracze i Jester poznają hasło. Oszust nie zna hasła.</p>
-            <p><span class="chaos-text">Opcja CHAOS</span> – nikt nie zna hasła! Gracze wymyślają skojarzenia na czuja, zwiększając zabawę i dezorientację. Jester nadal może wygrać, jeśli zostanie wygłosowany.</p>
+            <h2>Jak grać</h2>
+            <p><strong>1. Losowanie</strong> – każdy poznaje swoją rolę. Gracze i Jester widzą hasło, Oszust nie.</p>
+            <p><strong>2. Skojarzenia</strong> – gracze po kolei podają skojarzenia z hasłem. Nie można użyć samego hasła.</p>
+            <p><strong>3. Głosowanie</strong> – wszyscy głosują na podejrzaną osobę.</p>
 
-            <h3>Etap 2: Skojarzenia</h3>
-            <p>Gracze po kolei podają swoje skojarzenia z hasłem przez ustaloną liczbę tur. <strong>Zasady:</strong></p>
+            <h2>Kto wygrywa?</h2>
             <ul>
-                <li>Nie można użyć samego hasła ani słów w nim zawartych</li>
-                <li>Oszust w dowolnym momencie może się przyznać i zgadywać hasło:
-                    <ul>
-                        <li>Jeśli trafi → <strong>Oszust wygrywa</strong></li>
-                        <li>Jeśli nie trafi → odpada z gry</li>
-                    </ul>
-                </li>
+                <li>Wygłosowano <span class="role-oszust">Oszusta</span> → <strong>Gracze wygrywają</strong></li>
+                <li>Wygłosowano <span class="role-jester">Jestera</span> → <strong>Jester wygrywa</strong></li>
+                <li>Wygłosowano <span class="role-gracz">Gracza</span> → <strong>Oszust wygrywa</strong></li>
             </ul>
 
-            <h3>Etap 3: Głosowanie</h3>
-            <p>Gracze głosują na najbardziej podejrzaną osobę:</p>
-            <ul>
-                <li>Wygłosowano Oszusta → <strong>Gracze wygrywają</strong></li>
-                <li>Wygłosowano Jestera → <strong>Jester wygrywa</strong></li>
-                <li>Wygłosowano zwykłego Gracza → <strong>Oszust wygrywa</strong></li>
-            </ul>
+            <h2>Opcje specjalne</h2>
+            <p><span class="chaos-text">CHAOS</span> – 25% szans że wszyscy będą oszustami. Jester nadal może wygrać!</p>
+            <p><span class="role-jester">JESTER</span> – niezależna rola, może wygrać nawet w CHAOS.</p>
         </div>
         <button class="btn-primary" id="backFromInstructionBtn">POWRÓT</button>
     </div>
@@ -370,11 +378,16 @@
     // === Data and State ===
     const BAZA_PYTAN = {
         "Jedzenie i picie": ["Pizza", "Bimber", "Sushi", "Hamburger", "Spaghetti", "Lody", "Pierogi", "Kebab", "Arbuz", "Truskawka", "Brokuł", "Donut z cukrem", "Makaron", "Grochówka", "Pomidorowa", "Coca-cola", "Ser", "Herbata", "Kawa", "Matcha", "Kakao", "Kompot", "Masło", "Miód", "Cynamon", "Szarlotka", "Sernik", "Nachosy", "Popcorn", "Szpinak", "Rodzynki", "Orzechy laskowe", "Ogórkowa", "Rosół", "Whiskey", "Wódka", "Piwo", "Piwo bezalkoholowe", "Woda", "Cebularz", "Brownie", "Croissant", "Bułka z masłem", "Żurek", "Bigos", "Schabowy", "Kotlet mielony", "Gofry", "Naleśniki", "Pączek"],
-        "Filmy": ["Titanic", "Avatar", "Gladiator", "Matrix", "Shrek", "Joker", "Interstellar", "Furioza", "Pulp Fiction", "Ojciec chrzestny", "Incepcja", "Władca Pierścieni", "Harry Potter", "Piraci z Karaibów", "Gwiezdne wojny", "Król Lew", "Frozen", "Avengers", "Spider-Man", "Batman", "Superman", "Iron Man", "Toy Story", "Jurassic Park", "Terminator", "Forrest Gump", "Zielona mila", "Siedem", "Fighter", "Whiplash"],
+        "Filmy": ["Titanic", "Avatar", "Gladiator", "Matrix", "Shrek", "Joker", "Interstellar", "Furioza", "Pulp Fiction", "Ojciec chrzestny", "Incepcja", "Władca Pierścieni", "Harry Potter", "Piraci z Karaibów", "Gwiezdne wojny", "Król Lew", "Frozen", "Avengers", "Spider-Man", "Batman", "Superman", "Iron Man", "Toy Story", "Jurassic Park", "Terminator", "Forrest Gump", "Zielona mila", "Siedem", "Fighter", "Whiplash", "Gladiator", "Jak wytresować smoka", "Nemo", "Madagaskar", "Kung Fu Panda", "Shreka", "Across the Spider-Verse", "Deadpool", "Wolverine", "Thor", "Czarny Łabędź", "Incepcja", "Django", "Venom", "Dźwięk ciszy", "La La Land", "1917", "Dunkirk", "Tenet", "Oppenheimer"],
         "Przedmioty": ["Tłok", "Krzesło", "Stół", "Lampa", "Telefon", "Komputer", "Klawiatura", "Myszka", "Monitor", "Zeszyt", "Długopis", "Poduszka", "Koc", "Łóżko", "Szafa", "Lustro", "Zegar", "Dywan", "Zasłona", "Doniczka", "Kwiat", "Pilot", "Telewizor", "Słuchawki", "Głośnik", "Mikrofon", "Ładowarka", "Kabel", "Pendrive", "Powerbank", "Klucze", "Portfel", "Dokumenty", "Karta", "Okulary", "Etui", "Parasol", "Torba", "Walizka", "Czapka", "Kurtka", "Rękawiczki", "Skarpetki", "Buty", "Pasek", "Szalik", "Szczoteczka do zębów", "Grzebień", "Ręcznik", "Mydło"],
         "Zwierzęta": ["Papuga", "Jednorożec", "Kot", "Pies", "Słoń", "Delfin", "Orzeł", "Lew", "Pingwin", "Koala", "Ślimak", "Żyrafa", "Zebra", "Hipopotam", "Nosorożec", "Kangur", "Panda", "Niedźwiedź", "Wilk", "Lis", "Królik", "Chomik", "Żółw", "Krokodyl", "Rekin"],
         "Zawody": ["Lekarz", "Nauczyciel", "Strażak", "Pilot", "Kucharz", "Prawnik", "Programista", "Aktor", "Pielęgniarka", "Policjant", "Mechanik", "Elektryk", "Hydraulik", "Śmieciarz", "Kierowca autobusu", "Architekt", "Inżynier", "Dziennikarz", "Fotograf", "Fryzjer", "Sprzedawca", "Kelner", "Bibliotekarz", "Weterynarz", "Dentysta"],
-        "Sport": ["Piłka nożna", "Koszykówka", "Siatkówka", "Tenis", "Tenis stołowy", "Piłka ręczna", "Pływanie", "Skoki do wody", "Nurkowanie", "Łucznictwo", "Łyżwiarstwo figurowe", "Snowboard", "Skoki narciarskie", "Lekkoatletyka", "Bieganie", "Sprint", "Skok wzwyż", "Rzut młotem", "Rzut dyskiem", "Trampolina", "Akrobatyka", "Judo", "Karate", "Boks", "Kickboxing", "Kolarstwo torowe", "Kolarstwo szosowe", "Kolarstwo górskie", "Rzut kulą", "Siatkówka plażowa", "Mini golf", "Skateboarding", "Skoki spadochronowe", "Kulturystyka", "Siłownia", "Przysiady", "Podciąganie", "Szachy", "Warcaby", "Wspinaczka"]
+        "Sport": ["Piłka nożna", "Koszykówka", "Siatkówka", "Tenis", "Tenis stołowy", "Piłka ręczna", "Pływanie", "Skoki do wody", "Nurkowanie", "Łucznictwo", "Łyżwiarstwo figurowe", "Snowboard", "Skoki narciarskie", "Lekkoatletyka", "Bieganie", "Sprint", "Skok wzwyż", "Rzut młotem", "Rzut dyskiem", "Trampolina", "Akrobatyka", "Judo", "Karate", "Boks", "Kickboxing", "Kolarstwo torowe", "Kolarstwo szosowe", "Kolarstwo górskie", "Rzut kulą", "Siatkówka plażowa", "Mini golf", "Skateboarding", "Skoki spadochronowe", "Kulturystyka", "Siłownia", "Przysiady", "Podciąganie", "Szachy", "Warcaby", "Wspinaczka"],
+        "Supermoce": ["Latanie", "Niewidzialność", "Super siła", "Super szybkość", "Teleportacja", "Czytanie w myślach", "Kontrola czasu", "Strzelanie piorunami", "Strzelanie ogniem", "Kontrola lodu", "Zamrażanie", "Regeneracja", "Nieśmiertelność", "Kontrola wody", "Kontrola ziemi", "Kontrola wiatru", "Lasery z oczu", "Telekineza", "Zmiana kształtu", "Super inteligencja", "Kontrola umysłu", "Tworzenie iluzji", "Przechodzenie przez ściany", "Super słuch", "Super wzrok"],
+        "Kraje": ["Polska", "Niemcy", "Francja", "Włochy", "Hiszpania", "Wielka Brytania", "USA", "Kanada", "Meksyk", "Brazylia", "Argentyna", "Japonia", "Chiny", "Indie", "Rosja", "Australia", "Egipt", "RPA", "Grecja", "Turcja", "Holandia", "Belgia", "Szwecja", "Norwegia", "Portugalia"],
+        "Muzyka": ["The Beatles", "Queen", "Michael Jackson", "Madonna", "Elvis Presley", "Bob Marley", "Nirvana", "Metallica", "AC/DC", "Pink Floyd", "Led Zeppelin", "U2", "Coldplay", "Imagine Dragons", "Ed Sheeran", "Taylor Swift", "Beyoncé", "Rihanna", "Drake", "Eminem", "Dawid Podsiadło", "Sanah", "Taco Hemingway", "Doda", "Czesław Niemen"],
+        "Pojazdy": ["Samochód", "Rower", "Motor", "Autobus", "Tramwaj", "Pociąg", "Metro", "Samolot", "Helikopter", "Statek", "Jacht", "Łódź", "Kajak", "Żaglówka", "Poduszkowiec", "Ciężarówka", "Traktor", "Kombajn", "Czołg", "Rakieta", "Prom kosmiczny", "Balon na ogrzane powietrze", "Skuter", "Hulajnoga elektryczna", "Deskorolka"],
+        "Miejsca": ["Zamek", "Szkoła", "Szpital", "Kościół", "Restauracja", "Kino", "Teatr", "Muzeum", "Biblioteka", "Basen", "Stadion", "Park", "Zoo", "Aquapark", "Plac zabaw", "Sklep", "Supermarket", "Apteka", "Bank", "Poczta", "Dworzec kolejowy", "Lotnisko", "Stacja benzynowa", "Hotel", "Hostel", "Camping", "Plaża", "Las", "Góry", "Jaskinia", "Most", "Tunel", "Wieża", "Ratusz", "Urząd", "Komisariat", "Straż pożarna", "Cmentarz", "Port", "Przystań", "Kawiarnia", "Pub", "Klub nocny", "Siłownia", "Warszawa", "Lodowisko", "Kręgielnia", "Escape room", "Galeria handlowa", "Parking"]
     };
 
     let gracze = [], liczbaOszustow = 1, graczeDane = {}, aktualnieWidoczny = null;
@@ -560,39 +573,38 @@
         let oszusci;
         let jester = null; // maksymalnie 1 gracz z rolą Jester
         
+        if (jesterEnabled && gracze.length > 0) {
+            // Najpierw losuj Jestera (niezależnie od CHAOS)
+            jester = randomElement(gracze);
+        }
+        
         if (wszyscyOszusci) {
-            // W chaosie wszyscy są oszustami
-            oszusci = gracze.slice();
-            if (jesterEnabled && gracze.length > 0) {
-                jester = randomElement(gracze);
-            }
+            // W chaosie wszyscy są oszustami (oprócz Jestera, który jest niezależną rolą)
+            oszusci = gracze.filter(g => g !== jester);
         } else {
-            oszusci = shuffleArray(gracze).slice(0, liczbaOszustow);
-            
-            if (jesterEnabled) {
-                const pozostaliGracze = gracze.filter(g => !oszusci.includes(g));
-                if (pozostaliGracze.length > 0) {
-                    jester = randomElement(pozostaliGracze);
-                }
-            }
+            // Normalny tryb - losuj oszustów (ale nie Jestera)
+            const kandydaciNaOszustow = gracze.filter(g => g !== jester);
+            oszusci = shuffleArray(kandydaciNaOszustow).slice(0, liczbaOszustow);
         }
         
         graczeDane = {};
         gracze.forEach(g=>{
             if (g === jester) {
+                // Jester jest niezależną rolą - nie jest oszustem, nawet w CHAOS
                 graczeDane[g] = {
                     rola: 'JESTER',
                     haslo: haslo,
                     kategoria,
-                    jestOszustem: wszyscyOszusci, // w chaosie jester też jest oszustem
+                    jestOszustem: false, // Jester NIE jest oszustem, nawet w CHAOS
                     jestJester: true
                 };
             } else {
+                const jestOszustem = oszusci.includes(g);
                 graczeDane[g] = {
-                    rola: oszusci.includes(g) ? 'OSZUST':'GRACZ',
-                    haslo: oszusci.includes(g) ? null : haslo,
+                    rola: jestOszustem ? 'OSZUST':'GRACZ',
+                    haslo: jestOszustem ? null : haslo,
                     kategoria,
-                    jestOszustem: oszusci.includes(g),
+                    jestOszustem: jestOszustem,
                     jestJester: false
                 };
             }
@@ -781,7 +793,7 @@
         return voteCounts;
     };
 
-    // Check if Jester won
+    // Check if Jester won - Jester wygrywa jeśli został wygłosowany (nawet w CHAOS)
     const checkJesterWin = (voteCounts) => {
         const sortedVotes = gracze.map(g => ({ 
             name: g, 
@@ -789,6 +801,7 @@
             jestJester: graczeDane[g]?.jestJester
         })).sort((a, b) => b.votes - a.votes);
         
+        // Jester wygrywa jeśli jest wśród top wygłosowanych (liczbaOszustow najwyżej głosowanych)
         const topPlayers = sortedVotes.slice(0, liczbaOszustow);
         return topPlayers.some(p => p.jestJester);
     };
@@ -807,9 +820,10 @@
         
         // Dodaj informację o chaosie jeśli był
         if (czyChaos) {
+            const jestJester = gracze.some(g => graczeDane[g]?.jestJester);
             html += `<div class="result-item" style="background:rgba(255,215,0,0.3);border-color:rgba(255,215,0,0.6);margin-bottom:15px;">
                 <strong style="color:#ffd700;font-size:1.2em;">CHAOS!</strong><br>
-                Wszyscy gracze byli oszustami!
+                Wszyscy gracze byli oszustami!${jestJester ? ' (Jester jest niezależną rolą)' : ''}
             </div>`;
         }
         
