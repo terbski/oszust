@@ -298,7 +298,7 @@
     <!-- Ekran Gry -->
     <div id="gameScreen" class="screen">
         <h2>Kliknij swoje imię, aby zobaczyć rolę</h2>
-        <p class="instruction">Po zobaczeniu roli, kliknij ponownie aby ukryć</p>
+        <p class="instruction">Po zobaczeniu roli, kliknij ponownie aby ukryć i podaj telefon dalej</p>
         <div class="role-display" id="roleDisplay">
             <p>Wybierz swoje imię poniżej</p>
         </div>
@@ -337,7 +337,7 @@
     <!-- Ekran Zwycięstwa Jestera -->
     <div id="jesterWinScreen" class="screen">
         <div class="role-display" style="min-height:200px;border:3px solid #9c27b0;padding:30px;">
-            <h1 style="font-size:3em;margin:20px 0;color:#9c27b0;">jester was wydymał</h1>
+            <h1 style="font-size:3em;margin:20px 0;color:#9c27b0;">JESTER</h1>
             <p style="font-size:1.5em;margin:20px 0;">Jester został wygłosowany!</p>
         </div>
         <button class="btn-primary" id="continueBtnJester" style="margin-bottom:10px;">KONTYNUUJ GRĘ</button>
@@ -349,14 +349,14 @@
         <div class="role-display instruction-content" style="text-align:left;padding:20px;">
             <h2>Role</h2>
             <ul>
-                <li><span class="role-gracz">Gracz</span> – zna hasło, podaje skojarzenia</li>
-                <li><span class="role-oszust">Oszust</span> – nie zna hasła, musi je zgadnąć lub ukryć się</li>
+                <li><span class="role-gracz">Gracz</span> – zna hasło, podaje skojarzenia i stara się odnaleźć oszusta</li>
+                <li><span class="role-oszust">Oszust</span> – nie zna hasła, musi je zgadnąć podczas gry lub pozostać niewykryty w głosowaniu</li>
                 <li><span class="role-jester">Jester</span> – zna hasło, chce zostać wygłosowany</li>
             </ul>
 
             <h2>Jak grać</h2>
-            <p><strong>1. Losowanie</strong> – każdy poznaje swoją rolę. Gracze i Jester widzą hasło, Oszust nie.</p>
-            <p><strong>2. Skojarzenia</strong> – gracze po kolei podają skojarzenia z hasłem. Nie można użyć samego hasła.</p>
+            <p><strong>1. Losowanie</strong> – każdy poznaje swoją rolę. Gracze i Jester widzą hasło i kategorie, Oszust widzi tylko kategorie.</p>
+            <p><strong>2. Gra</strong> – gracze po kolei przez wybraną liczbę rund podają skojarzenia z hasłem. Nie można użyć samego hasła.</p>
             <p><strong>3. Głosowanie</strong> – wszyscy głosują na podejrzaną osobę.</p>
 
             <h2>Kto wygrywa?</h2>
@@ -367,8 +367,8 @@
             </ul>
 
             <h2>Opcje specjalne</h2>
-            <p><span class="chaos-text">CHAOS</span> – 25% szans że wszyscy będą oszustami. Jester nadal może wygrać!</p>
-            <p><span class="role-jester">JESTER</span> – niezależna rola, może wygrać nawet w CHAOS.</p>
+            <p><span class="chaos-text">CHAOS</span> – 25% szans że wszyscy będą oszustami, opcja urozmaica zabawę</p>
+            <p><span class="role-jester">JESTER</span> – specjalna rola pozwalająca ci wygrać grę jeśli przekonasz innych do głosowania na siebie</p>
         </div>
         <button class="btn-primary" id="backFromInstructionBtn">POWRÓT</button>
     </div>
