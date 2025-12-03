@@ -254,6 +254,31 @@
             opacity:0.3; cursor:not-allowed; pointer-events:none;
         }
     </style>
+    <!-- Szablony adnotacji wygranych -->
+    <template id="annotation-chaos">
+        <div class="result-item" style="background:rgba(255,215,0,0.3);border-color:rgba(255,215,0,0.6);margin-bottom:15px;">
+            <strong style="color:#ffd700;font-size:1.2em;">CHAOS!</strong><br>
+            Wszyscy gracze byli oszustami!
+        </div>
+    </template>
+    <template id="annotation-jester">
+        <div class="result-item" style="background:rgba(156,39,176,0.2);border-color:rgba(156,39,176,0.5);margin-bottom:15px;">
+            <strong style="color:#9c27b0;font-size:1.2em;">Jester wygrał!</strong><br>
+            Jester został wygłosowany i wygrywa!
+        </div>
+    </template>
+    <template id="annotation-gracze">
+        <div class="result-item" style="background:rgba(44, 185, 99, 0.23);border-color:rgba(44,185,99,0.4);margin-bottom:15px;">
+            <strong style="color:#27ae60;font-size:1.2em;">Gracze zwyciężyli!</strong><br>
+            Wszyscy oszuści zostali wskazani. Gracze wygrywają!
+        </div>
+    </template>
+    <template id="annotation-oszusci">
+        <div class="result-item" style="background:rgba(245,87,108,0.13);border-color:rgba(245,87,108,0.4);margin-bottom:15px;">
+            <strong style="color:#e74c3c;font-size:1.2em;">Oszust(i) zwyciężyli!</strong><br>
+            Nie udało się wskazać wszystkich oszustów. Wygrywają oszuści!
+        </div>
+    </template>
 </head>
 <body>
 <div class="container">
@@ -286,12 +311,18 @@
                 <input type="checkbox" id="allOszusciCheckbox" style="width:20px;height:20px;cursor:pointer;accent-color:#ffd700;">
                 <span id="chaosOptionText">Opcja Chaosu</span>
             </label>
+            <div style="font-size:13px;color:#fff;margin-left:30px;margin-top:4px;">
+                <em>25% szans że wszyscy będą oszustami, opcja urozmaica zabawę</em>
+            </div>
         </div>
         <div class="input-group">
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
                 <input type="checkbox" id="jesterCheckbox" style="width:20px;height:20px;cursor:pointer;accent-color:#9c27b0;">
                 <span id="jesterOptionText">Opcja Jester</span>
             </label>
+            <div style="font-size:13px;color:#fff;margin-left:30px;margin-top:4px;">
+                <em>Specjalna rola pozwalająca ci wygrać grę jeśli przekonasz innych do głosowania na siebie</em>
+            </div>
         </div>
         <button class="btn-primary" id="startBtn" disabled>START GRY</button>
     </div>
@@ -325,24 +356,6 @@
         <button class="btn-primary" id="continueBtn" style="margin-bottom:10px;">KONTYNUUJ GRĘ</button>
         <button class="btn-primary" id="newGameBtn">NOWA GRA</button>
     </div>
-    <!-- Ekran Chaos -->
-    <div id="chaosScreen" class="screen">
-        <h1 style="font-size:4em;margin:30px 0;">CHAOS</h1>
-        <div class="role-display" style="min-height:200px;">
-            <p style="font-size:1.5em;margin:20px 0;">Wszyscy gracze byli oszustami!</p>
-        </div>
-        <button class="btn-primary" id="continueBtnChaos" style="margin-bottom:10px;">KONTYNUUJ GRĘ</button>
-        <button class="btn-primary" id="newGameBtnChaos">NOWA GRA</button>
-    </div>
-    <!-- Ekran Zwycięstwa Jestera -->
-    <div id="jesterWinScreen" class="screen">
-        <div class="role-display" style="min-height:200px;border:3px solid #9c27b0;padding:30px;">
-            <h1 style="font-size:3em;margin:20px 0;color:#9c27b0;">JESTER</h1>
-            <p style="font-size:1.5em;margin:20px 0;">Jester został wygłosowany!</p>
-        </div>
-        <button class="btn-primary" id="continueBtnJester" style="margin-bottom:10px;">KONTYNUUJ GRĘ</button>
-        <button class="btn-primary" id="newGameBtnJester">NOWA GRA</button>
-    </div>
     <!-- Ekran Instrukcji -->
     <div id="instructionScreen" class="screen">
         <h1>📖 INSTRUKCJA</h1>
@@ -365,10 +378,6 @@
                 <li>Wygłosowano <span class="role-jester">Jestera</span> → <strong>Jester wygrywa</strong></li>
                 <li>Wygłosowano <span class="role-gracz">Gracza</span> → <strong>Oszust wygrywa</strong></li>
             </ul>
-
-            <h2>Opcje specjalne</h2>
-            <p><span class="chaos-text">CHAOS</span> – 25% szans że wszyscy będą oszustami, opcja urozmaica zabawę</p>
-            <p><span class="role-jester">JESTER</span> – specjalna rola pozwalająca ci wygrać grę jeśli przekonasz innych do głosowania na siebie</p>
         </div>
         <button class="btn-primary" id="backFromInstructionBtn">POWRÓT</button>
     </div>
@@ -793,40 +802,71 @@
         return voteCounts;
     };
 
-    // Check if Jester won - Jester wygrywa jeśli został wygłosowany (nawet w CHAOS)
-    const checkJesterWin = (voteCounts) => {
-        const sortedVotes = gracze.map(g => ({ 
-            name: g, 
-            votes: voteCounts[g] || 0,
-            jestJester: graczeDane[g]?.jestJester
-        })).sort((a, b) => b.votes - a.votes);
-        
-        // Jester wygrywa jeśli jest wśród top wygłosowanych (liczbaOszustow najwyżej głosowanych)
-        const topPlayers = sortedVotes.slice(0, liczbaOszustow);
-        return topPlayers.some(p => p.jestJester);
-    };
+    // Zmodyfikowana funkcja sprawdzająca zwycięzcę (gracze/oszuści/jester/chaos)
+    /**
+     * Zwraca { winner: "GRACZE"|"OSZUŚCI"|"JESTER"|"CHAOS" }
+     */
+    function whoWonGame(voteCounts) {
+        // Wariant CHAOS: wszyscy oszuści (poza Jesterem)
+        if (czyChaos) {
+            return { winner: "CHAOS" };
+        }
 
-    // Render voting results (shared function)
-    const renderVotingResults = (voteCounts) => {
-        const sortedVotes = gracze.map(g => ({ 
-            name: g, 
+        // Zbierz głosy dla każdego gracza
+        const sortedVotes = gracze.map(g => ({
+            name: g,
             votes: voteCounts[g] || 0,
             jestOszustem: graczeDane[g]?.jestOszustem,
             jestJester: graczeDane[g]?.jestJester
         })).sort((a, b) => b.votes - a.votes);
 
-        const topCount = liczbaOszustow;
-        let html = '';
-        
-        // Dodaj informację o chaosie jeśli był
-        if (czyChaos) {
-            const jestJester = gracze.some(g => graczeDane[g]?.jestJester);
-            html += `<div class="result-item" style="background:rgba(255,215,0,0.3);border-color:rgba(255,215,0,0.6);margin-bottom:15px;">
-                <strong style="color:#ffd700;font-size:1.2em;">CHAOS!</strong><br>
-                Wszyscy gracze byli oszustami!${jestJester ? ' (Jester jest niezależną rolą)' : ''}
-            </div>`;
+        // Kto został wygłosowany ("top" N osób)
+        const topPlayers = sortedVotes.slice(0, liczbaOszustow);
+
+        // Wygrana Jesetera jeśli jest wśród wygłosowanych
+        if (topPlayers.some(p => p.jestJester)) {
+            return { winner: "JESTER" };
         }
-        
+
+        // Wygrana graczy: dokładnie tylu oszustów wskazano ilu jest w grze?
+        const iluOszustowZaglosowanych = topPlayers.filter(p => p.jestOszustem).length;
+        const iluOszustowFaktycznie = gracze.filter(g => graczeDane[g]?.jestOszustem).length;
+
+        if (iluOszustowFaktycznie > 0 && iluOszustowZaglosowanych === iluOszustowFaktycznie) {
+            return { winner: "GRACZE" };
+        }
+        return { winner: "OSZUŚCI" };
+    }
+
+    // Pobiera adnotację-html o wygranej z template (w head)
+    function getAnnotationTemplate(winner) {
+        let tid = '';
+        if (winner === "CHAOS") tid = "annotation-chaos";
+        else if (winner === "JESTER") tid = "annotation-jester";
+        else if (winner === "GRACZE") tid = "annotation-gracze";
+        else if (winner === "OSZUŚCI") tid = "annotation-oszusci";
+        if (!tid) return '';
+        const tpl = document.getElementById(tid);
+        return tpl && tpl.content ? tpl.innerHTML || tpl.content.firstElementChild.outerHTML : '';
+    }
+
+    // Funkcja renderująca wyniki głosowania (używamy szablonu adnotacji)
+    function renderVotingResultsFinal(voteCounts) {
+        let html = '';
+        const winnerObj = whoWonGame(voteCounts);
+
+        // Użyj szablonu-adnotacji zamiast generować go tu w kodzie
+        html += getAnnotationTemplate(winnerObj.winner);
+
+        // Lista szczegółowa głosów
+        const sortedVotes = gracze.map(g => ({
+            name: g,
+            votes: voteCounts[g] || 0,
+            jestOszustem: graczeDane[g]?.jestOszustem,
+            jestJester: graczeDane[g]?.jestJester
+        })).sort((a, b) => b.votes - a.votes);
+        const topCount = liczbaOszustow;
+
         html += sortedVotes.map((item, index) => {
             let roleBadge;
             if (item.jestJester) {
@@ -836,48 +876,41 @@
             } else {
                 roleBadge = '<span style="color:#4caf50;font-weight:bold;">GRACZ</span>';
             }
-            
             const isCorrect = index < topCount && item.jestOszustem;
-            const bgColor = isCorrect 
-                ? 'background:rgba(76,175,80,0.3);border-color:rgba(76,175,80,0.6);' 
+            const bgColor = isCorrect
+                ? 'background:rgba(76,175,80,0.3);border-color:rgba(76,175,80,0.6);'
                 : 'background:rgba(102,126,234,0.2);border-color:rgba(102,126,234,0.4);';
-            
             return `<div class="result-item" style="${bgColor}">
                 ${item.name}: ${item.votes} ${item.votes === 1 ? 'głos' : 'głosów'} - ${roleBadge}
             </div>`;
         }).join('');
-        
-        return html;
-    };
 
-    // Show voting results
+        return html;
+    }
+
+    // --- SHOW/RESET functions, dalej unchanged, usunięto referencje do nieistniejących już ekranów chaosu ---
     const showVotingResults = () => {
         const voteCounts = countVotes();
-        if (checkJesterWin(voteCounts)) {
-            showScreen('jesterWinScreen');
-            return;
-        }
-        votingResultsList.innerHTML = renderVotingResults(voteCounts);
+        votingResultsList.innerHTML = renderVotingResultsFinal(voteCounts);
         showScreen('resultScreen');
     };
 
-    // Show results without voting or with partial voting
+    // Analogicznie w przypadku showResults (pominięcie głosowania):
     const showResults = () => {
         const hasVotes = Object.keys(glosy).length > 0;
         if (hasVotes) {
             const voteCounts = countVotes();
-            if (checkJesterWin(voteCounts)) {
-                showScreen('jesterWinScreen');
-                return;
-            }
-            votingResultsList.innerHTML = renderVotingResults(voteCounts);
+            votingResultsList.innerHTML = renderVotingResultsFinal(voteCounts);
         } else {
             votingResultsList.innerHTML = '<div class="result-item" style="background:rgba(255,255,255,0.1);">Głosowanie pominięte</div>';
         }
         showScreen('resultScreen');
     };
 
-    // Reset game state (shared function)
+    // ...pozostałe funkcje bez zmian...
+
+    // Continue/NewGame/reset etc:
+    // (zachowane jak poprzednio)
     const resetGameState = () => {
         graczeDane = {}; 
         aktualnieWidoczny = null;
@@ -894,10 +927,7 @@
         showScreen('menuScreen');
     };
     continueBtn.onclick = continueGame;
-    continueBtnChaos.onclick = continueGame;
-    continueBtnJester.onclick = continueGame;
-
-    // Reset all game data (shared function)
+    // usunięto continueBtnChaos.onclick
     const resetAllGameData = () => {
         gracze = [];
         liczbaOszustow = 1;
@@ -928,8 +958,7 @@
         showScreen('menuScreen');
     };
     newGameBtn.onclick = newGame;
-    newGameBtnChaos.onclick = newGame;
-    newGameBtnJester.onclick = newGame;
+    // usunięto newGameBtnChaos.onclick
 
     // === Show/Hide screens ===
     const showScreen = screenId => {
@@ -938,21 +967,15 @@
     };
 
     // Instruction button handler
-    instructionBtn.onclick = function() {
-        showScreen('instructionScreen');
-    };
-
-    // Back from instruction button handler
-    backFromInstructionBtn.onclick = function() {
-        showScreen('menuScreen');
-    };
+    instructionBtn.onclick = function() { showScreen('instructionScreen'); };
+    backFromInstructionBtn.onclick = function() { showScreen('menuScreen'); };
 
     // === Initial Rendering ===
     updateOszustyOptions();
     updatePlayersList();
     updateCategoryButtons();
     updateStartButton();
-    // Check initial state of chaos and jester checkboxes
+    // Ustawienie klas checkboxów
     const chaosText = $('chaosOptionText');
     const jesterText = $('jesterOptionText');
     if (chaosText) {
